@@ -1,4 +1,5 @@
 // script.js
+import { createUserWithEmailAndPassword } from 'firebase/auth';  // Import createUserWithEmailAndPassword
 const db = require('./db');
 
 
