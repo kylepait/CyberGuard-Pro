@@ -1,4 +1,5 @@
-
+// script.js
+const db = require('./db');
 
 
 console.log('Script.js loaded successfully.');
@@ -28,12 +29,27 @@ function completeSignup() {
     const email = document.getElementById('email').value;
     const password = document.getElementById('signup-password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
+    const organizationId = document.getElementById('organization-id').value;
+
 
     if (password !== confirmPassword) {
         // Passwords do not match
         document.getElementById('password-mismatch-msg').textContent = "Passwords do not match.";
         return;
     }
+
+    const query = 'INSERT INTO users_table (email, password, organization_id) VALUES (?, ?, ?)';
+    const values = [email, password, organizationId];
+
+    db.query(query, values)
+        .then(([results]) => {
+            console.log('Signup Successful', results);
+            document.getElementById('password-mismatch-msg').textContent = "";
+        })
+        .catch((error) => {
+            console.error('Signup Error', error.message);
+            document.getElementById('password-mismatch-msg').textContent = "Error during signup.";
+        });
 
     createUserWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
