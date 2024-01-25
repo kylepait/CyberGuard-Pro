@@ -1,5 +1,24 @@
 // script.js
-import { createUserWithEmailAndPassword } from 'firebase/auth';  // Import createUserWithEmailAndPassword
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
+
+// Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyBU8GUvAhx0k7D9Uvp5SEGl7dmb5p0W8B8",
+    authDomain: "cyberguard-pro.firebaseapp.com",
+    projectId: "cyberguard-pro",
+    storageBucket: "cyberguard-pro.appspot.com",
+    messagingSenderId: "84548542407",
+    appId: "1:84548542407:web:c4599c3f3707da29c043e2",
+    measurementId: "G-9HFXYJZ9TC"
+};
+
+// Initialize Firebase
+const firebaseApp = initializeApp(firebaseConfig);
+
+// Firebase Auth
+const auth = getAuth(firebaseApp);
+
 const db = require('./db');
 
 
