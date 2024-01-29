@@ -3,13 +3,13 @@ const bodyParser = require('body-parser');
 const routesHandler = require('./routes/handler.js');
 const pool = require('./config/db.js')
 
-require(dotenv/config);
+require('dotenv/config');
 
 //Database connection
 pool.getConnection( (err, conn) =>{
     if (err) throw err;
 
-    
+
 })
 
 /** 
