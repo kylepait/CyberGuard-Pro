@@ -8,6 +8,8 @@ require(dotenv/config);
 //Database connection
 pool.getConnection( (err, conn) =>{
     if (err) throw err;
+
+    
 })
 
 /** 
