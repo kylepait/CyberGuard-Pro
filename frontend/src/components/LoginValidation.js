@@ -18,7 +18,7 @@ function validation(values){
 
     }
     else if(!password_pattern.test(values.password)) {
-        error.password = "Password didn't match"
+        error.password = "Password requires 8 characters, one uppercase, one lower and one number"
 
     } else {
         error.password = ""

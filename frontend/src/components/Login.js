@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate  } from 'react-router-dom';
 import validation from './LoginValidation';
 
 //Hello, this is Mack testing a git push
 
 function Login() {
+
+    const navigate = useNavigate(); // Initialize useNavigate
 
         const [values, setValues] = useState({
             email: '',
@@ -42,6 +44,8 @@ function Login() {
                         if (response.ok) {
                             // Login successful
                             setLoginSuccess(true);
+                            navigate('/user-home');
+
                         } else {
                             // Login failed
                             console.error(data.error);
@@ -60,7 +64,6 @@ function Login() {
                     {loginSuccess ? (
                         <div>
                             <h2>Login Successful!</h2>
-                            {/* You can customize this success message or redirect the user to another page */}
                         </div>
                     ) : (
                         <form action="" onSubmit={handleSubmit}>
