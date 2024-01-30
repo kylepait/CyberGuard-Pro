@@ -17,9 +17,10 @@ pool.getConnection( (err, conn) =>{
     const username = 'testUsername';
     const password = 'testPassword';
     const organization_id = '000000';
+    const email = 'test@gmail.com'
 
-    const qry = 'INSERT INTO users_table(username, password, organization_id) VALUES(?,?,?)'
-    conn.query(qry, [username, password, organization_id], (err, result) => {
+    const qry = 'INSERT INTO users_table(username, password, organization_id, email) VALUES(?,?,?,?)'
+    conn.query(qry, [username, password, organization_id, email], (err, result) => {
         conn.release();
         if (err) throw err;
         console.log(result);
