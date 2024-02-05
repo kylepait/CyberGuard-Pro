@@ -14,7 +14,7 @@ router.options('/getUserData', cors());
 router.get('/getUserData', (req, res) => {
     const userId = req.user ? req.user.id : 1; // Default to a specific user or handle non-authenticated users differently
 
-    const qry = 'SELECT username, email, password, organization_id FROM users_table WHERE id = ?';
+    const qry = 'SELECT username, email, password, organization_id FROM users WHERE id = ?';
     
     pool.query(qry, [userId], (err, result) => {
         if (err) {
@@ -40,7 +40,7 @@ router.get('/Signup', async (req, res) => {
             return;
         }
 
-        const qry = 'SELECT u.username, u.password, u.organization_id FROM users_table as u';
+        const qry = 'SELECT u.username, u.password, u.organization_id FROM users as u';
         
         connection.query(qry, (err, result) => {
             connection.release();
@@ -58,12 +58,15 @@ router.get('/Signup', async (req, res) => {
 
 router.post('/Signup', (req, res) => {
     
-    const qry = 'INSERT INTO users_table (username, password, organization_id, email) VALUES (?,?,?,?)';
+    const qry = 'INSERT INTO users (username, password, organization_id, email, first_name, last_name, user_role) VALUES (?,?,?,?,?,?,?)';
     const values = [
         req.body.username,
         req.body.password,
         req.body.org_id, 
-        req.body.email
+        req.body.email,
+        req.body.first_name,
+        req.body.last_name,
+        req.body.user_role
     ]
 
     pool.query(qry, values, (err, data) => {
@@ -79,7 +82,7 @@ router.post('/Signup', (req, res) => {
 
 router.post('/Login', (req, res) => {
     const { email, password } = req.body;
-    const qry = 'SELECT * FROM users_table WHERE email = ? AND password = ?';
+    const qry = 'SELECT * FROM users WHERE email = ? AND password = ?';
     const values = [email, password];
 
     pool.query(qry, values, (err, result) => {

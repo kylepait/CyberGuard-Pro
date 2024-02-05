@@ -9,7 +9,11 @@ function Signup() {
             email: '',
             password: '',
             username: '',
-            org_id: ''
+            org_id: '',
+            first_name: '',
+            last_name: '',
+            registration_date: '',
+            user_role: ''
         })
 
         const [errors, setErrors] = useState({})
@@ -37,6 +41,12 @@ function Signup() {
                         password: values.password,
                         org_id: values.org_id,
                         email: values.email,
+                        first_name: values.first_name,
+                        last_name: values.last_name,
+                        //registration_date: values.registration_date,
+                        user_role: values.user_role
+
+
                     }),
                     mode: 'cors', // Set the mode to 'cors'
                 })
@@ -80,6 +90,26 @@ function Signup() {
                         <label htmlFor='org_id'><strong>Organization ID</strong></label>
                         <input type='org_id' placeholder='Enter Organization ID' name='org_id'
                         onChange={handleInput} className='form-control rounded 0'/>
+                    </div>
+                    <div className='mb-3'>
+                        <label htmlFor='first_name'><strong>First Name</strong></label>
+                        <input type='first_name' placeholder='First Name' name='first_name'
+                        onChange={handleInput} className='form-control rounded 0'/>
+                    </div>
+                    <div className='mb-3'>
+                        <label htmlFor='last_name'><strong>Last Name</strong></label>
+                        <input type='last_name' placeholder='Last Name' name='last_name'
+                        onChange={handleInput} className='form-control rounded 0'/>
+                    </div>
+                    
+
+                    
+                    <div className='mb-3'>
+                        <label htmlFor='user_role'><strong>Select User Role</strong></label>
+                        <select name='user_role' onChange={handleInput} className='form-control rounded-0'>
+                            <option value='employee'>Employee</option>
+                            <option value='management'>Management</option>
+                        </select>
                     </div>
                     <button type='submit' className='btn btn-success w-100 rounded 0'><strong>Sign Up</strong></button>
                     <p></p>

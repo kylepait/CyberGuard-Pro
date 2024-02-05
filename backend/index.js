@@ -14,6 +14,7 @@ app.use(bodyParser.json());
 app.use('/', routesHandler);
 
 //Database connection
+/** 
 pool.getConnection( (err, conn) =>{
     if (err) throw err;
 
@@ -30,7 +31,7 @@ pool.getConnection( (err, conn) =>{
     });
 
 });
-
+*/
 /** 
 const app = express();
 app.use(bodyParser.urlencoded({extended:false}));
