@@ -1,49 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 function UserHome() {
-    const [userData, setUserData] = useState(null);
+  const user = JSON.parse(localStorage.getItem('user')); // Retrieve the user object from local storage
 
-    useEffect(() => {
-        const fetchUserData = async () => {
-            try {
-                const response = await fetch('http://localhost:4000/getUserData', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-
-                });
-
-                const data = await response.json();
-
-                if (response.ok) {
-                    setUserData(data.user);
-                } else {
-                    console.error(data.error);
-                }
-            } catch (error) {
-                console.error('Error fetching user data:', error);
-            }
-        };
-
-        fetchUserData();
-    }, []);
-
-    return (
-        <div>
-            <h2>User Home Page</h2>
-            {userData ? (
-                <div>
-                    <p>Username: {userData.username}</p>
-                    <p>Email: {userData.email}</p>
-                    <p>Password: {userData.password}</p>
-                    <p>Organization ID: {userData.organization_id}</p>
-                </div>
-            ) : (
-                <p>Loading user data...</p>
-            )}
-        </div>
-    );
+  return (
+    <div>
+      <h2>Welcome, {user.username}!</h2>
+      <p>Email: {user.email}</p>
+      <p>First Name: {user.first_name}</p>
+      <p>Last Name: {user.last_name}</p>
+      <p>Organization ID: {user.organization_id}</p>
+      <p>User Role: {user.user_role}</p>
+    </div>
+  );
 }
 
 export default UserHome;

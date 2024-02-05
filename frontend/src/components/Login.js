@@ -44,6 +44,8 @@ function Login() {
                         if (response.ok) {
                             // Login successful
                             setLoginSuccess(true);
+                            console.log(data.user); // Log the user object to the console
+                            localStorage.setItem('user', JSON.stringify(data.user)); // Store the user object in local storage
                             navigate('/user-home');
 
                         } else {

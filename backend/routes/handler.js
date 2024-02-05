@@ -7,30 +7,7 @@ const bodyParser = require('body-parser');
 // Use cors middleware
 router.use(cors());
 
-// Allow preflight requests
-router.options('/getUserData', cors());
 
-
-router.get('/getUserData', (req, res) => {
-    const userId = req.user ? req.user.id : 1; // Default to a specific user or handle non-authenticated users differently
-
-    const qry = 'SELECT username, email, password, organization_id FROM users WHERE id = ?';
-    
-    pool.query(qry, [userId], (err, result) => {
-        if (err) {
-            console.error('Error executing getUserData query:', err);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
-
-        if (result.length > 0) {
-            const userData = result[0];
-            // Send the user data to the client
-            return res.json(userData);
-        } else {
-            return res.status(404).json({ error: 'User not found' });
-        }
-    });
-});
 
 router.get('/Signup', async (req, res) => {
     pool.getConnection((err, connection) => {
