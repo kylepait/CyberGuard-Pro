@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 
-//Hello, this is Mack testing a git push
 
 function Login() {
     const [email, setEmail] = useState('');
