@@ -6,7 +6,7 @@ import validation from './LoginValidation';
 
 function Login() {
 
-    const navigate = useNavigate(); // Initialize useNavigate
+    const navigate = useNavigate(); //Initialize useNavigate
 
         const [values, setValues] = useState({
             email: '',

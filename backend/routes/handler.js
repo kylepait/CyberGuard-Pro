@@ -17,7 +17,7 @@ router.get('/Signup', async (req, res) => {
             return;
         }
 
-        const qry = 'SELECT u.username, u.password, u.organization_id FROM users as u';
+        const qry = 'SELECT u.username, u.password, u.organization_id, u.first_name, u.last_name FROM users as u';
         
         connection.query(qry, (err, result) => {
             connection.release();
