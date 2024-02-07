@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Link, useNavigate  } from 'react-router-dom';
 import validation from './LoginValidation';
 
-//Hello, this is Mack testing a git push
 
 function Login() {
 
