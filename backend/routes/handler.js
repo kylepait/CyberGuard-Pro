@@ -59,7 +59,7 @@ router.post('/Signup', (req, res) => {
 
 router.get('/badges', (req, res) => {
     const userId = req.query.user_id;
-    const qry = 'SELECT * FROM badges WHERE user_id = ?';
+    const qry = 'SELECT * FROM user_badges WHERE user_id = ?';
     
     pool.query(qry, [userId], (err, result) => {
         if (err) {

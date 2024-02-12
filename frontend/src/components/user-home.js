@@ -42,7 +42,9 @@ function UserHome() {
       {badges.length > 0 ? (
         <ul>
           {badges.map(badge => (
-            <li key={badge.badges_id}>{badge.badge_name}</li>
+            <li key={badge.badge_id}>
+              {badge.badge_id} - {badge.badge_name}
+            </li>
           ))}
         </ul>
       ) : (
