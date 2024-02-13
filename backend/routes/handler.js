@@ -71,6 +71,20 @@ router.get('/badges', (req, res) => {
     });
 });
 
+router.get('/employees', (req, res) => {
+    const organizationId = req.query.organization_id;
+    const qry = 'SELECT * FROM users WHERE organization_id = ? AND user_role = "employee"';
+    
+    pool.query(qry, [organizationId], (err, result) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        
+        res.json(result);
+    });
+});
+
 router.post('/Login', (req, res) => {
     const { email, password } = req.body;
     const qry = 'SELECT * FROM users WHERE email = ? AND password = ?';
