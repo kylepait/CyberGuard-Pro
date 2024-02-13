@@ -111,5 +111,24 @@ router.post('/Login', (req, res) => {
     });
 });
 
+router.get('/TrainingModule', (req, res) => {
+    const userId = req.query.user_id;
+    /*Still Working on update/trigger
+    const updateQuery = '
+        UPDATE user_training_progress
+        SET 
+        ';
+    */
+    const qry = 'SELECT * FROM user_training_progress WHERE user_id = ?';
+    
+    pool.query(qry, [userId], (err, result) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        
+        res.json(result);
+    });
+});
 
 module.exports = router;
