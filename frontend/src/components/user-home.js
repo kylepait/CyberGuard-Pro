@@ -41,6 +41,7 @@ function UserHome() {
     fetchBadges();
   }, [user.id]);
 
+
   if (loading) {
     return <p>Loading badges...</p>;
   }
@@ -81,43 +82,45 @@ function UserHome() {
         ))}
       </ul>
       {user.user_role === 'management' && (
-        <div>
-          <h3>Employees in Your Organization:</h3>
-          <ul>
-            {employees.map(employee => (
-              <li key={employee.user_id}>
-                <p>First Name: {employee.first_name}</p>
-                <p>Last Name: {employee.last_name}</p>
-                <p>Email: {employee.email}</p>
-                <p>User ID: {employee.user_id}</p>
-                <ul>
-                  {console.log("Badges for user ID", employee.user_id, ":", badges.filter(badge => badge.user_id === employee.user_id))}
-                  {badges.map(badge => (
-                    <li key={badge.badge_id}>
-                      {badge.badge_id === 1 && (
-                        <>
-                          <img src={process.env.PUBLIC_URL + '/gold_badge.jpg'} alt="Gold Badge" style={{ width: '100px', height: '100px' }} />
-                          {badge.badge_id} - {badge.badge_name}
-                        </>
-                      )}
-                      {badge.badge_id === 2 && (
-                        <>
-                          <img src={process.env.PUBLIC_URL + '/silver_badge.jpg'} alt="Silver Badge" style={{ width: '100px', height: '100px' }} />
-                          {badge.badge_id} - {badge.badge_name}
-                        </>
-                      )}
-                      {badge.badge_id === 3 && (
-                        <>
-                          <img src={process.env.PUBLIC_URL + '/bronze_badge.jpg'} alt="Bronze Badge" style={{ width: '100px', height: '100px' }} />
-                          {badge.badge_id} - {badge.badge_name}
-                        </>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            ))}
-          </ul>
+        <div className='bg-info p-3 rounded w-25'>
+          <div>
+            <h3>Employees in Your Organization:</h3>
+            <ul>
+              {employees.map(employee => (
+                <li key={employee.user_id}>
+                  <p>First Name: {employee.first_name}</p>
+                  <p>Last Name: {employee.last_name}</p>
+                  <p>Email: {employee.email}</p>
+                  <p>User ID: {employee.user_id}</p>
+                  <ul>
+                    {console.log("Badges for user ID", employee.user_id, ":", badges.filter(badge => badge.user_id === employee.user_id))}
+                    {badges.map(badge => (
+                      <li key={badge.badge_id}>
+                        {badge.badge_id === 1 && (
+                          <>
+                            <img src={process.env.PUBLIC_URL + '/gold_badge.jpg'} alt="Gold Badge" style={{ width: '100px', height: '100px' }} />
+                            {badge.badge_id} - {badge.badge_name}
+                          </>
+                        )}
+                        {badge.badge_id === 2 && (
+                          <>
+                            <img src={process.env.PUBLIC_URL + '/silver_badge.jpg'} alt="Silver Badge" style={{ width: '100px', height: '100px' }} />
+                            {badge.badge_id} - {badge.badge_name}
+                          </>
+                        )}
+                        {badge.badge_id === 3 && (
+                          <>
+                            <img src={process.env.PUBLIC_URL + '/bronze_badge.jpg'} alt="Bronze Badge" style={{ width: '100px', height: '100px' }} />
+                            {badge.badge_id} - {badge.badge_name}
+                          </>
+                        )}
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
       )}
     </div>
