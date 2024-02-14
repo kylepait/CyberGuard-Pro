@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate  } from 'react-router-dom';
 
 
 
@@ -48,6 +49,10 @@ function UserHome() {
 
   return (
     <div>
+
+      <Link to='/TrainingModule' className='btn btn-default border w-15 bg-light rounded 0 text-decoration-none'>Training Module Page</Link>
+
+
       <h2>Welcome, {user.username}!</h2>
       <p>Email: {user.email}</p>
       <p>User ID: {user.user_id}</p>
