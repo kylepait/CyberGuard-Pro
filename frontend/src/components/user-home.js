@@ -11,36 +11,43 @@ function UserHome() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    
     const fetchBadges = async () => {
       try {
         const response = await fetch(`http://localhost:4000/badges?user_id=${user.user_id}`);
         const data = await response.json();
         setBadges(data);
-        setLoading(false);
       } catch (error) {
         console.error('Error fetching badges:', error);
-        setLoading(false);
-      }
-
-      const fetchEmployees = async () => {
-        try {
-          const response = await fetch(`http://localhost:4000/employees?organization_id=${user.organization_id}`);
-          const data = await response.json();
-          setEmployees(data);
-        } catch (error) {
-          console.error('Error fetching employees:', error);
-        }
-      };
-  
-      if (user.user_role === 'management') {
-        fetchEmployees();
       }
     };
-
   
-
+    // New function to fetch badges of employees within the manager's organization
+    const fetchEmployeeBadges = async () => {
+      try {
+        const response = await fetch(`http://localhost:4000/badges/organization/${user.organization_id}`);
+        const data = await response.json();
+        setEmployees(data); // Assuming the endpoint returns structured data as discussed
+        setLoading(false); // Set loading to false after fetching data
+      } catch (error) {
+        console.error('Error fetching employee badges:', error);
+        setLoading(false); // Ensure loading is set to false even if there is an error
+      }
+    };
+  
+    // Call fetchBadges for all users
     fetchBadges();
-  }, [user.id]);
+  
+    // Call fetchEmployeeBadges if the user is a manager
+    if (user.user_role === 'management') {
+      fetchEmployeeBadges();
+    } else {
+      // If not a manager, ensure loading is set to false
+      // This is necessary if no other data fetching is performed for non-managers
+      setLoading(false);
+    }
+  }, [user.user_id, user.user_role, user.organization_id]); // Added dependencies for useEffect
+  
 
 
   if (loading) {
@@ -65,67 +72,31 @@ function UserHome() {
       <ul>
         {badges.map(badge => (
           <li key={badge.badge_id}>
-            {badge.badge_id === 1 && (
-              <>
-                <img src={process.env.PUBLIC_URL + '/gold_badge.jpg'} alt="Gold Badge" style={{ width: '100px', height: '100px' }} />
-                {badge.badge_id} - {badge.badge_name}
-              </>
-            )}
-            {badge.badge_id === 2 && (
-              <>
-                <img src={process.env.PUBLIC_URL + '/silver_badge.jpg'} alt="Silver Badge" style={{ width: '100px', height: '100px' }} />
-                {badge.badge_id} - {badge.badge_name}
-              </>
-            )}
-            {badge.badge_id === 3 && (
-              <>
-                <img src={process.env.PUBLIC_URL + '/bronze_badge.jpg'} alt="Bronze Badge" style={{ width: '100px', height: '100px' }} />
-                {badge.badge_id} - {badge.badge_name}
-              </>
-            )}
+            <img src={`${process.env.PUBLIC_URL}${badge.image_path}`} alt={badge.badge_name} style={{ width: '100px', height: '100px' }} />
           </li>
         ))}
       </ul>
       {user.user_role === 'management' && (
         <div className='bg-info p-3 rounded w-25'>
-          <div>
-            <h3>Employees in Your Organization:</h3>
-            <ul>
-              {employees.map(employee => (
-                <li key={employee.user_id}>
-                  <p>First Name: {employee.first_name}</p>
-                  <p>Last Name: {employee.last_name}</p>
-                  <p>Email: {employee.email}</p>
-                  <p>User ID: {employee.user_id}</p>
-                  <ul>
-                    {console.log("Badges for user ID", employee.user_id, ":", badges.filter(badge => badge.user_id === employee.user_id))}
-                    {badges.map(badge => (
-                      <li key={badge.badge_id}>
-                        {badge.badge_id === 1 && (
-                          <>
-                            <img src={process.env.PUBLIC_URL + '/gold_badge.jpg'} alt="Gold Badge" style={{ width: '100px', height: '100px' }} />
-                            {badge.badge_id} - {badge.badge_name}
-                          </>
-                        )}
-                        {badge.badge_id === 2 && (
-                          <>
-                            <img src={process.env.PUBLIC_URL + '/silver_badge.jpg'} alt="Silver Badge" style={{ width: '100px', height: '100px' }} />
-                            {badge.badge_id} - {badge.badge_name}
-                          </>
-                        )}
-                        {badge.badge_id === 3 && (
-                          <>
-                            <img src={process.env.PUBLIC_URL + '/bronze_badge.jpg'} alt="Bronze Badge" style={{ width: '100px', height: '100px' }} />
-                            {badge.badge_id} - {badge.badge_name}
-                          </>
-                        )}
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <h3>Employees in Your Organization:</h3>
+          <ul>
+            {employees.map(employee => (
+              <li key={employee.user_id}>
+                <p>First Name: {employee.first_name}</p>
+                <p>Last Name: {employee.last_name}</p>
+                <p>Email: {employee.email}</p>
+                <p>User ID: {employee.user_id}</p>
+                <ul>
+                  {employee.badges.map(badge => ( // Assuming each employee object has a badges array
+                    <li key={badge.badge_id}>
+                      <img src={process.env.PUBLIC_URL + badge.image_path} alt={badge.badge_name} style={{ width: '100px', height: '100px' }} />
+                      {badge.badge_id} - {badge.badge_name}
+                    </li>
+                  ))}
+                </ul>
+              </li>
+            ))}
+          </ul>
         </div>
       )}
     </div>

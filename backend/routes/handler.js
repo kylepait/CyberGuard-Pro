@@ -59,29 +59,67 @@ router.post('/Signup', (req, res) => {
 
 router.get('/badges', (req, res) => {
     const userId = req.query.user_id;
-    const qry = 'SELECT * FROM user_badges WHERE user_id = ?';
-    
+    // Adjusted query to join user_badges with badges table to include badge name and image path
+    const qry = `
+        SELECT ub.user_id, ub.badge_id, b.badge_name, b.image_path
+        FROM user_badges ub
+        INNER JOIN badges b ON ub.badge_id = b.badge_id
+        WHERE ub.user_id = ?`;
+
     pool.query(qry, [userId], (err, result) => {
         if (err) {
             console.error('Error executing query:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
-        
+
         res.json(result);
     });
 });
 
-router.get('/employees', (req, res) => {
-    const organizationId = req.query.organization_id;
-    const qry = 'SELECT * FROM users WHERE organization_id = ? AND user_role = "employee"';
+// Endpoint to get badges of all employees in a manager's organization
+router.get('/badges/organization/:organizationId', (req, res) => {
+    const organizationId = req.params.organizationId;
+    
+    const qry = `
+        SELECT users.user_id, users.first_name, users.last_name, users.email, user_badges.badge_id, badges.badge_name, badges.image_path
+        FROM users
+        INNER JOIN user_badges ON users.user_id = user_badges.user_id
+        INNER JOIN badges ON user_badges.badge_id = badges.badge_id
+        WHERE users.organization_id = ? AND users.user_role != 'management';
+    `;
     
     pool.query(qry, [organizationId], (err, result) => {
         if (err) {
             console.error('Error executing query:', err);
-            return res.status(500).json({ error: 'Internal Server Error' });
+            return res.status(500).json({ error: 'Internal Server Error', details: err });
         }
         
-        res.json(result);
+        // Process result to group badges by user
+        const employees = result.reduce((acc, curr) => {
+            const userIndex = acc.findIndex(user => user.user_id === curr.user_id);
+            if (userIndex > -1) {
+                acc[userIndex].badges.push({
+                    badge_id: curr.badge_id,
+                    badge_name: curr.badge_name,
+                    image_path: curr.image_path
+                });
+            } else {
+                acc.push({
+                    user_id: curr.user_id,
+                    first_name: curr.first_name,
+                    last_name: curr.last_name,
+                    email: curr.email,
+                    badges: [{
+                        badge_id: curr.badge_id,
+                        badge_name: curr.badge_name,
+                        image_path: curr.image_path
+                    }]
+                });
+            }
+            return acc;
+        }, []);
+        
+        res.json(employees);
     });
 });
 
