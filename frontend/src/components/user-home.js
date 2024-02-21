@@ -72,7 +72,8 @@ function UserHome() {
       <ul>
         {badges.map(badge => (
           <li key={badge.badge_id}>
-            <img src={`${process.env.PUBLIC_URL}${badge.image_path}`} alt={badge.badge_name} style={{ width: '100px', height: '100px' }} />
+            <img src={process.env.PUBLIC_URL + badge.image_path} alt={badge.badge_name} style={{ width: '100px', height: '100px' }} />
+            {badge.badge_id} - {badge.badge_name}
           </li>
         ))}
       </ul>
