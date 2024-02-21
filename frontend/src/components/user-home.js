@@ -9,8 +9,71 @@ function UserHome() {
   const [badges, setBadges] = useState([]);
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [generatedPassword, setGeneratedPassword] = useState('');
+
+
+  const generatePassword = (length = 12) => {
+    const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+=-';
+    let password = '';
+    for (let i = 0; i < length; i++) {
+      const randomIndex = Math.floor(Math.random() * charset.length);
+      password += charset[randomIndex];
+    }
+    setGeneratedPassword(password);
+  };
+
+  const updatePassword = async () => {
+    if (!generatedPassword) return;
+  
+    try {
+      const response = await fetch('http://localhost:4000/update-password', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.user_id, newPassword: generatedPassword }),
+      });
+  
+      const data = await response.json();
+      if (data.success) {
+        alert('Password updated successfully!');
+        setGeneratedPassword(''); // Clear the password field after update
+      } else {
+        alert('Failed to update password');
+      }
+    } catch (error) {
+      console.error('Error updating password:', error);
+      alert('Error updating password');
+    }
+  };
+
+  const awardBadge = async (badgeId) => {
+    try {
+      const response = await fetch('http://localhost:4000/add-badge', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.user_id, badgeId }),
+      });
+  
+      const data = await response.json();
+      if (data.success) {
+        alert('Badge awarded successfully!');
+      } else {
+        alert('Failed to award Badge.');
+      }
+    } catch (error) {
+      console.error('Error awarding Badge:', error);
+      alert('Error awarding Badge');
+    }
+  };
+
+
 
   useEffect(() => {
+
+
     
     const fetchBadges = async () => {
       try {
@@ -67,6 +130,21 @@ function UserHome() {
       <p>Last Name: {user.last_name}</p>
       <p>Organization ID: {user.organization_id}</p>
       <p>User Role: {user.user_role}</p>
+
+      
+      <div className='password-generator'>
+      <button onClick={() => {generatePassword(12); awardBadge(4);}} className='btn btn-primary'>
+        Generate Password and Award Password Badge
+      </button>
+        {generatedPassword && (
+          <>
+            <p>Generated Password: <strong>{generatedPassword}</strong></p>
+            <button onClick={updatePassword} className='btn btn-success'>
+              Set as My New Password
+            </button>
+          </>
+        )}
+      </div>
 
       <h3>Your Badges:</h3>
       <ul>

@@ -149,6 +149,36 @@ router.post('/Login', (req, res) => {
     });
 });
 
+router.post('/update-password', (req, res) => {
+    const { userId, newPassword } = req.body;
+
+    // Directly using the new password without hashing (not recommended for production)
+    const qry = 'UPDATE users SET password = ? WHERE user_id = ?';
+
+    pool.query(qry, [newPassword, userId], (err, result) => {
+        if (err) {
+            console.error('Error updating password:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        res.json({ success: true, message: 'Password updated successfully' });
+    });
+});
+
+router.post('/add-badge', (req, res) => {
+    const { userId, badgeId } = req.body;
+
+    const insertSql = 'INSERT INTO user_badges (user_id, badge_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE badge_id=badge_id';
+
+    pool.query(insertSql, [userId, badgeId], (err, result) => {
+        if (err) {
+            console.error('Error adding badge to user:', err);
+            return res.status(500).json({ error: 'Failed to add badge to user' });
+        }
+        res.json({ success: true, message: 'Badge added to user successfully' });
+    });
+});
+
 router.get('/TrainingModule', (req, res) => {
     const userId = req.query.user_id;
     /*Still Working on update/trigger
