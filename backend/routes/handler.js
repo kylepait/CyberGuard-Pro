@@ -203,21 +203,80 @@ router.get('/user-training-modules', (req, res) => {
     });
 });
 
-router.post('/complete-training', (req, res) => {
+router.post('/complete-training', async (req, res) => {
     const { userId, moduleId } = req.body;
 
-    const updateSql = `
-        UPDATE user_training_modules
-        SET status = 'completed'
-        WHERE user_id = ? AND module_id = ?;
-    `;
+    // Start a transaction
+    pool.getConnection((err, connection) => {
+        if (err) throw err; // not connected!
+        connection.beginTransaction(err => {
+            if (err) throw err;
 
-    pool.query(updateSql, [userId, moduleId], (err, result) => {
-        if (err) {
-            console.error('Error completing training module:', err);
-            return res.status(500).json({ error: 'Failed to complete training module' });
-        }
-        res.json({ success: true, message: 'Training module completed successfully' });
+            // Update the training module status to completed
+            const updateTrainingSql = `
+                UPDATE user_training_modules
+                SET status = 'completed'
+                WHERE user_id = ? AND module_id = ?;
+            `;
+            connection.query(updateTrainingSql, [userId, moduleId], (err, result) => {
+                if (err) {
+                    return connection.rollback(() => {
+                        throw err;
+                    });
+                }
+
+                // Check if there's a badge associated with this module
+                const checkBadgeSql = `
+                    SELECT badge_id FROM module_badges WHERE module_id = ?;
+                `;
+                connection.query(checkBadgeSql, [moduleId], (err, results) => {
+                    if (err) {
+                        return connection.rollback(() => {
+                            throw err;
+                        });
+                    }
+
+                    if (results.length > 0) {
+                        const badgeId = results[0].badge_id;
+
+                        // Award the badge
+                        const awardBadgeSql = `
+                            INSERT INTO user_badges (user_id, badge_id) VALUES (?, ?)
+                            ON DUPLICATE KEY UPDATE badge_id = badge_id; -- Prevents duplicate badge assignments
+                        `;
+                        connection.query(awardBadgeSql, [userId, badgeId], (err, result) => {
+                            if (err) {
+                                return connection.rollback(() => {
+                                    throw err;
+                                });
+                            }
+
+                            // Commit the transaction
+                            connection.commit(err => {
+                                if (err) {
+                                    return connection.rollback(() => {
+                                        throw err;
+                                    });
+                                }
+                                console.log('Training completed and badge awarded successfully');
+                                res.json({ success: true, message: 'Training completed and badge awarded successfully' });
+                            });
+                        });
+                    } else {
+                        // Commit the transaction even if no badge is awarded
+                        connection.commit(err => {
+                            if (err) {
+                                return connection.rollback(() => {
+                                    throw err;
+                                });
+                            }
+                            console.log('Training completed successfully');
+                            res.json({ success: true, message: 'Training completed successfully' });
+                        });
+                    }
+                });
+            });
+        });
     });
 });
 
