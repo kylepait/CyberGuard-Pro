@@ -280,27 +280,24 @@ router.post('/complete-training', async (req, res) => {
     });
 });
 
-/**  
 
-router.get('/TrainingModule', (req, res) => {
-    const userId = req.query.user_id;
-    /*Still Working on update/trigger
-    const updateQuery = '
-        UPDATE user_training_progress
-        SET 
-        ';
-
-    const qry = 'SELECT * FROM user_training_progress WHERE user_id = ?';
-    
-    pool.query(qry, [userId], (err, result) => {
+router.get('/training-assignments/:organizationId', (req, res) => {
+    const organizationId = req.params.organizationId;
+    const qry = `
+        SELECT utm.user_id, u.username, u.first_name, u.last_name, tm.module_name, utm.status
+        FROM user_training_modules utm
+        JOIN users u ON utm.user_id = u.user_id
+        JOIN training_modules tm ON utm.module_id = tm.module_id
+        WHERE u.organization_id = ? AND u.user_role != 'management';
+    `;
+    pool.query(qry, [organizationId], (err, results) => {
         if (err) {
-            console.error('Error executing query:', err);
+            console.error('Error fetching training assignments:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
         }
-        
-        res.json(result);
+        res.json(results);
     });
 });
 
-*/
+
 module.exports = router;
