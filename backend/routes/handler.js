@@ -179,6 +179,50 @@ router.post('/add-badge', (req, res) => {
     });
 });
 
+router.get('/user-training-modules', (req, res) => {
+    const userId = req.query.userId;
+
+    const qry = `
+        SELECT tm.module_id, tm.module_name, tm.module_link, utm.status
+        FROM user_training_modules utm
+        JOIN training_modules tm ON utm.module_id = tm.module_id
+        WHERE utm.user_id = ?;
+    `;
+
+    pool.query(qry, [userId], (err, result) => {
+        if (err) {
+            console.error('Error fetching training modules:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Separate the modules into assigned and completed
+        const assignedModules = result.filter(module => module.status === 'assigned');
+        const completedModules = result.filter(module => module.status === 'completed');
+
+        res.json({ assignedModules, completedModules });
+    });
+});
+
+router.post('/complete-training', (req, res) => {
+    const { userId, moduleId } = req.body;
+
+    const updateSql = `
+        UPDATE user_training_modules
+        SET status = 'completed'
+        WHERE user_id = ? AND module_id = ?;
+    `;
+
+    pool.query(updateSql, [userId, moduleId], (err, result) => {
+        if (err) {
+            console.error('Error completing training module:', err);
+            return res.status(500).json({ error: 'Failed to complete training module' });
+        }
+        res.json({ success: true, message: 'Training module completed successfully' });
+    });
+});
+
+/**  
+
 router.get('/TrainingModule', (req, res) => {
     const userId = req.query.user_id;
     /*Still Working on update/trigger
@@ -186,7 +230,7 @@ router.get('/TrainingModule', (req, res) => {
         UPDATE user_training_progress
         SET 
         ';
-    */
+
     const qry = 'SELECT * FROM user_training_progress WHERE user_id = ?';
     
     pool.query(qry, [userId], (err, result) => {
@@ -199,4 +243,5 @@ router.get('/TrainingModule', (req, res) => {
     });
 });
 
+*/
 module.exports = router;

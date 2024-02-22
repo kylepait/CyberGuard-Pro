@@ -152,7 +152,7 @@ function UserHome() {
 
       <div className='password-generator' style={{ marginBottom: '20px' }}>
         <button onClick={() => { generatePassword(12); awardBadge(4); }} style={{ marginRight: '10px', padding: '10px 15px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-          Generate Password and Award Password Badge
+          Generate Password
         </button>
         {generatedPassword && (
           <>
