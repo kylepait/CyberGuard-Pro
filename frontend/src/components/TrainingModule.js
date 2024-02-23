@@ -11,6 +11,26 @@ function TrainingModulesPage() {
   const user = JSON.parse(localStorage.getItem('user'));
 
 
+  const [selectedEmployee, setSelectedEmployee] = useState('');
+  const [selectedModule, setSelectedModule] = useState('');
+
+  const [employees, setEmployees] = useState([]);
+
+  const enrollEmployeeInTraining = async () => {
+      const response = await fetch('http://localhost:4000/enroll-employee-training', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ employeeUserId: selectedEmployee, moduleId: selectedModule })
+      });
+      const data = await response.json();
+      if (data.success) {
+          alert('Employee enrolled successfully!');
+          // Optionally: Refresh the list of enrolled trainings
+      } else {
+          alert('Failed to enroll employee.');
+      }
+  };
+
 
 
   useEffect(() => {
@@ -21,6 +41,19 @@ function TrainingModulesPage() {
         fetchTrainingAssignments();
       }
       fetchTrainingModules();
+
+      const fetchEmployees = async () => {
+        if (user.user_role === 'management') {
+          const url = `http://localhost:4000/employees/organization/${user.organization_id}`; // Updated URL to match the new endpoint
+          const response = await fetch(url);
+          const data = await response.json();
+          setEmployees(data);
+        }
+      };
+      
+      fetchEmployees();
+
+
     }, [user.user_id, user.user_role, user.organization_id]);
 
 
@@ -131,18 +164,37 @@ function TrainingModulesPage() {
       </div>
   
       {user.user_role === 'management' && (
-        <div style={{ marginTop: '40px', backgroundColor: '#f2f2f2', padding: '20px', borderRadius: '10px' }}>
-          <h2>Training Assignments for My Employees</h2>
-          <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
-            {trainingAssignments.map((assignment) => (
-              <li key={`${assignment.user_id}-${assignment.module_name}`} style={{ padding: '10px 0' }}>
-                {`${assignment.first_name} ${assignment.last_name}`} - {assignment.module_name} ({assignment.status})
-              </li>
-            ))}
-          </ul>
-        </div>
+        <>
+          <div style={{ marginTop: '40px', backgroundColor: '#f2f2f2', padding: '20px', borderRadius: '10px' }}>
+            <h2>Training Assignments for My Employees</h2>
+            {/* Existing code for displaying assignments */}
+          </div>
+
+          <div style={{ marginTop: '20px', backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+            <h2>Enroll Employees in Training</h2>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px' }}>
+              <select value={selectedEmployee} onChange={e => setSelectedEmployee(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+                <option value="">Select Employee</option>
+                {employees.map(employee => (
+                  <option key={employee.user_id} value={employee.user_id}>{employee.first_name} {employee.last_name}</option>
+                ))}
+              </select>
+              <select value={selectedModule} onChange={e => setSelectedModule(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+                <option value="">Select Training Module</option>
+                {allTrainings.map(module => (
+                  <option key={module.module_id} value={module.module_id}>{module.module_name}</option>
+                ))}
+              </select>
+              <button onClick={enrollEmployeeInTraining} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px', cursor: 'pointer', border: 'none' }}>
+                Enroll Employee
+              </button>
+            </div>
+          </div>
+        </>
       )}
     </div>
+
+    
   );
 }
 

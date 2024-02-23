@@ -322,5 +322,40 @@ router.post('/enroll-training', (req, res) => {
     });
 });
 
+router.post('/enroll-employee-training', (req, res) => {
+    const { employeeUserId, moduleId } = req.body;
+    const managerId = req.managerId; // Determine managerId based on session or token
+
+    // Optional: Check if the employee belongs to the manager's organization
+    // and if the moduleId is valid, then proceed with enrollment
+
+    const qry = 'INSERT INTO user_training_modules (user_id, module_id, status) VALUES (?, ?, "assigned") ON DUPLICATE KEY UPDATE status = "assigned"';
+    pool.query(qry, [employeeUserId, moduleId], (err, results) => {
+        if (err) {
+            console.error('Error enrolling employee in training module:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json({ success: true, message: 'Employee enrolled in training module successfully' });
+    });
+});
+
+router.get('/employees/organization/:organizationId', (req, res) => {
+    const organizationId = req.params.organizationId;
+    
+    const qry = `
+        SELECT user_id, first_name, last_name, email
+        FROM users
+        WHERE organization_id = ? AND user_role != 'management';
+    `;
+    
+    pool.query(qry, [organizationId], (err, result) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            return res.status(500).json({ error: 'Internal Server Error', details: err });
+        }
+        
+        res.json(result);
+    });
+});
 
 module.exports = router;
