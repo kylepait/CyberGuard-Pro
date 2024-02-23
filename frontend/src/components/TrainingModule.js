@@ -26,6 +26,8 @@ function TrainingModulesPage() {
       if (data.success) {
           alert('Employee enrolled successfully!');
           // Optionally: Refresh the list of enrolled trainings
+          fetchTrainingAssignments(); // Call this function to refresh assignments
+
       } else {
           alert('Failed to enroll employee.');
       }
@@ -167,7 +169,13 @@ function TrainingModulesPage() {
         <>
           <div style={{ marginTop: '40px', backgroundColor: '#f2f2f2', padding: '20px', borderRadius: '10px' }}>
             <h2>Training Assignments for My Employees</h2>
-            {/* Existing code for displaying assignments */}
+              <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
+              {trainingAssignments.map((assignment) => (
+                <li key={`${assignment.user_id}-${assignment.module_name}`} style={{ padding: '10px 0' }}>
+                  {`${assignment.first_name} ${assignment.last_name}`} - {assignment.module_name} ({assignment.status})
+                </li>
+              ))}
+            </ul>
           </div>
 
           <div style={{ marginTop: '20px', backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
