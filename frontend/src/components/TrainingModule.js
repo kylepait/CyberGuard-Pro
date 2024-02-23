@@ -10,12 +10,7 @@ function TrainingModulesPage() {
 
   const user = JSON.parse(localStorage.getItem('user'));
 
-  // Declare fetchAllTrainings outside useEffect
-  const fetchAllTrainings = async () => {
-    const response = await fetch('http://localhost:4000/all-trainings'); 
-    const data = await response.json();
-    setAllTrainings(data);
-  };
+
 
 
   useEffect(() => {
@@ -28,20 +23,30 @@ function TrainingModulesPage() {
       fetchTrainingModules();
     }, [user.user_id, user.user_role, user.organization_id]);
 
-    const enrollInTraining = async (moduleId) => {
-      const response = await fetch('http://localhost:4000/enroll-training', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: user.user_id, moduleId: moduleId })
-      });
-      const data = await response.json();
-      if (data.success) {
-        alert('Enrolled successfully!');
-        fetchAllTrainings(); // This function is now accessible here
-      } else {
-        alert('Failed to enroll.');
-      }
-    };
+
+  // Declare fetchAllTrainings outside useEffect
+  const fetchAllTrainings = async () => {
+    const response = await fetch('http://localhost:4000/all-trainings'); 
+    const data = await response.json();
+    setAllTrainings(data);
+  };
+
+  const enrollInTraining = async (moduleId) => {
+    const response = await fetch('http://localhost:4000/enroll-training', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.user_id, moduleId: moduleId })
+    });
+    const data = await response.json();
+    if (data.success) {
+      alert('Enrolled successfully!');
+      fetchAllTrainings(); // This function is now accessible here
+      fetchTrainingModules();
+    } else {
+      alert('Failed to enroll.');
+    }
+  };
+
   const fetchTrainingAssignments = async () => {
     const response = await fetch(`http://localhost:4000/training-assignments/${user.organization_id}`);
     const data = await response.json();
