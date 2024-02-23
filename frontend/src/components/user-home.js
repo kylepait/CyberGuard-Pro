@@ -120,6 +120,8 @@ function UserHome() {
   return (
     <div style={{ margin: '20px', fontFamily: 'Arial, sans-serif' }}>
 
+
+
     <Link to='/TrainingModule' style={{ margin: '10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
       Training Module Page
     </Link>
