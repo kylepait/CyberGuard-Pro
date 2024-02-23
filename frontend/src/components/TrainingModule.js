@@ -4,25 +4,49 @@ function TrainingModulesPage() {
   const [assignedModules, setAssignedModules] = useState([]);
   const [completedModules, setCompletedModules] = useState([]);
 
+  const [allTrainings, setAllTrainings] = useState([]);
+
   const [trainingAssignments, setTrainingAssignments] = useState([]);
 
   const user = JSON.parse(localStorage.getItem('user'));
 
+  // Declare fetchAllTrainings outside useEffect
+  const fetchAllTrainings = async () => {
+    const response = await fetch('http://localhost:4000/all-trainings'); 
+    const data = await response.json();
+    setAllTrainings(data);
+  };
 
 
   useEffect(() => {
-  
-    if (user.user_role === 'management') {
-      fetchTrainingAssignments();
-    }
-    fetchTrainingModules();
-  }, [user.user_id, user.user_role, user.organization_id]); // Fetch training modules when the component mounts or user_id changes
 
+      fetchAllTrainings();
+    
+      if (user.user_role === 'management') {
+        fetchTrainingAssignments();
+      }
+      fetchTrainingModules();
+    }, [user.user_id, user.user_role, user.organization_id]);
+
+    const enrollInTraining = async (moduleId) => {
+      const response = await fetch('http://localhost:4000/enroll-training', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.user_id, moduleId: moduleId })
+      });
+      const data = await response.json();
+      if (data.success) {
+        alert('Enrolled successfully!');
+        fetchAllTrainings(); // This function is now accessible here
+      } else {
+        alert('Failed to enroll.');
+      }
+    };
   const fetchTrainingAssignments = async () => {
     const response = await fetch(`http://localhost:4000/training-assignments/${user.organization_id}`);
     const data = await response.json();
     setTrainingAssignments(data);
-};
+  };
 
   const fetchTrainingModules = async () => {
     const response = await fetch(`http://localhost:4000/user-training-modules?userId=${user.user_id}`);
@@ -81,6 +105,24 @@ function TrainingModulesPage() {
             <iframe src={module.module_link} width="100%" height="315" title={module.module_name} style={{ border: 'none' }}></iframe>
           </div>
         ))}
+      </div>
+
+      <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ccc', borderRadius: '5px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', backgroundColor: '#f0f8ff' }}>
+        <h2 style={{ borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>Training Catalog</h2>
+        <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
+          {allTrainings.map((training) => (
+            <li key={training.module_id} style={{ padding: '10px 0', borderBottom: '1px solid #eee' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <h3 style={{ margin: '0' }}>{training.module_name}</h3>
+                <button 
+                  onClick={() => enrollInTraining(training.module_id)} 
+                  style={{ backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>
+                  Enroll In Training Module
+                </button>
+              </div>
+            </li>
+          ))}
+        </ul>
       </div>
   
       {user.user_role === 'management' && (

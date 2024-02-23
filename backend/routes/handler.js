@@ -299,5 +299,28 @@ router.get('/training-assignments/:organizationId', (req, res) => {
     });
 });
 
+router.get('/all-trainings', (req, res) => {
+    const qry = 'SELECT module_id, module_name FROM training_modules';
+    pool.query(qry, (err, results) => {
+        if (err) {
+            console.error('Error fetching training modules:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json(results);
+    });
+});
+
+router.post('/enroll-training', (req, res) => {
+    const { userId, moduleId } = req.body;
+    const qry = 'INSERT INTO user_training_modules (user_id, module_id, status) VALUES (?, ?, "assigned")';
+    pool.query(qry, [userId, moduleId], (err, results) => {
+        if (err) {
+            console.error('Error enrolling in training module:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json({ success: true, message: 'Enrolled in training module successfully' });
+    });
+});
+
 
 module.exports = router;

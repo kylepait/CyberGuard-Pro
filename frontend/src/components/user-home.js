@@ -120,13 +120,12 @@ function UserHome() {
   return (
     <div style={{ margin: '20px', fontFamily: 'Arial, sans-serif' }}>
 
-      <Link to='/TrainingModule' style={{ margin: '10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
-        Training Module Page
-      </Link>
+    <Link to='/TrainingModule' style={{ margin: '10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
+      Training Module Page
+    </Link>
 
-      <div style={{ display: 'flex', marginBottom: '20px' }}>
-      {/* User Info Section */}
-      <div style={{ flex: 1, paddingRight: '20px' }}> {/* Adjust the paddingRight as needed */}
+    <div style={{ display: 'flex', marginBottom: '20px', gap: '20px' }}>
+      <div style={{ flex: 1, backgroundColor: '#ffffff', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
         <h2>Welcome, {user.username}!</h2>
         <p>Email: {user.email}</p>
         <p>User ID: {user.user_id}</p>
@@ -136,8 +135,7 @@ function UserHome() {
         <p>User Role: {user.user_role}</p>
       </div>
 
-      {/* Badges Section */}
-      <div style={{ flex: 1 }}>
+      <div style={{ flex: 1, backgroundColor: '#ffffff', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
         <h3>Your Badges:</h3>
         <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
           {badges.map(badge => (
@@ -150,41 +148,39 @@ function UserHome() {
       </div>
     </div>
 
-      <div className='password-generator' style={{ marginBottom: '20px' }}>
-        <button onClick={() => { generatePassword(12); awardBadge(4); }} style={{ marginRight: '10px', padding: '10px 15px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-          Generate Password
-        </button>
-        {generatedPassword && (
-          <>
-            <p>Generated Password: <strong>{generatedPassword}</strong></p>
-            <button onClick={updatePassword} style={{ padding: '10px 15px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
-              Set as My New Password
-            </button>
-          </>
-        )}
-      </div>
+    <div className='password-generator' style={{ backgroundColor: '#ffffff', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)', marginBottom: '20px' }}>
+      <button onClick={() => { generatePassword(12); awardBadge(4); }} style={{ marginRight: '10px', padding: '10px 15px', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+        Generate Password
+      </button>
+      {generatedPassword && (
+        <>
+          <p>Generated Password: <strong>{generatedPassword}</strong></p>
+          <button onClick={updatePassword} style={{ padding: '10px 15px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
+            Set as My New Password
+          </button>
+        </>
+      )}
+    </div>
 
       {user.user_role === 'management' && (
-        <div style={{ backgroundColor: '#17a2b8', padding: '20px', borderRadius: '5px', color: 'white', marginTop: '20px' }}>
-          <h3>Employees in Your Organization:</h3>
-          <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
+        <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', color: '#343a40', marginTop: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+          <h3 style={{ color: '#17a2b8' }}>Employees in Your Organization:</h3>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '15px' }}>
             {employees.map(employee => (
-              <li key={employee.user_id} style={{ marginBottom: '10px' }}>
-                <p>First Name: {employee.first_name}</p>
-                <p>Last Name: {employee.last_name}</p>
-                <p>Email: {employee.email}</p>
-                <p>User ID: {employee.user_id}</p>
-                <ul style={{ listStyleType: 'none', paddingLeft: '20px' }}>
+              <div key={employee.user_id} style={{ background: 'white', borderRadius: '5px', padding: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                <h4 style={{ margin: '0 0 10px 0' }}>{employee.first_name} {employee.last_name}</h4>
+                <p style={{ margin: '0' }}>Email: {employee.email}</p>
+                <p style={{ margin: '0' }}>User ID: {employee.user_id}</p>
+                <div style={{ marginTop: '10px' }}>
                   {employee.badges.map(badge => (
-                    <li key={badge.badge_id}>
-                      <img src={process.env.PUBLIC_URL + badge.image_path} alt={badge.badge_name} style={{ width: '100px', height: '100px', marginRight: '10px', verticalAlign: 'middle' }} />
-                      {badge.badge_id} - {badge.badge_name}
-                    </li>
+                    <span key={badge.badge_id} style={{ display: 'inline-block', background: '#e9ecef', borderRadius: '5px', padding: '5px 10px', marginRight: '5px', marginBottom: '5px', fontSize: '14px' }}>
+                      {badge.badge_name}
+                    </span>
                   ))}
-                </ul>
-              </li>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         </div>
       )}
     </div>
