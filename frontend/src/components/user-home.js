@@ -126,6 +126,12 @@ function UserHome() {
       Training Module Page
     </Link>
 
+    {user.user_role === 'management' && (
+        <Link to='/manager_metrics' style={{ margin: '10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
+          Manager Metrics Dashboard
+        </Link>
+    )}
+
     <div style={{ display: 'flex', marginBottom: '20px', gap: '20px' }}>
       <div style={{ flex: 1, backgroundColor: '#ffffff', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
         <h2>Welcome, {user.username}!</h2>
