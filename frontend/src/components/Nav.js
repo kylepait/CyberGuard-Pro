@@ -12,7 +12,7 @@ function Nav() {
                 <div className="navbar-nav ml-auto">
                     <Link to='/' className="nav-item nav-link active">Login</Link>
                     <Link to='/signup' className="nav-item nav-link">Signup</Link>
-                    <Link to='/trainingModule' className="nav-item nav-link">Training Module</Link>
+                    <Link to='/trainingModule' className="nav-item nav-link">Training</Link>
                     <Link to='/user-home' className="nav-item nav-link">Home</Link>
                 </div>
             </div>
