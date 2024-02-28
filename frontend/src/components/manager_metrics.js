@@ -137,11 +137,12 @@ function TrainingModulesPage() {
   return (
     <div style={{ padding: '20px' }}>
 
+        <h2 style={{ borderBottom: '25px solid #17a2b8', paddingBottom: '10px' }}>Metrics Dashboard</h2>
   
 
         {/* Section for Employee Badges */}
         <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', color: '#343a40', marginTop: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-            <h3 style={{ color: '#17a2b8' }}>Employees in Your Organization:</h3>
+            <h3>Employees in Your Organization:</h3>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '15px' }}>
                 {employees.map(employee => (
                 <div key={employee.user_id} style={{ background: 'white', borderRadius: '5px', padding: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
@@ -168,7 +169,7 @@ function TrainingModulesPage() {
       
         <>
         <div style={{ marginTop: '40px', backgroundColor: '#f2f2f2', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-            <h2 style={{ borderBottom: '2px solid #17a2b8', paddingBottom: '10px' }}>Training Assignments for My Employees</h2>
+            <h2>Training Assignments for My Employees</h2>
             <ul style={{ listStyleType: 'none', paddingLeft: '0', marginTop: '20px' }}>
                 {trainingAssignments.map((assignment) => (
                 <li key={`${assignment.user_id}-${assignment.module_name}`} style={{ 
@@ -181,7 +182,7 @@ function TrainingModulesPage() {
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     }}>
-                    <span style={{ fontWeight: 'bold' }}>{`${assignment.first_name} ${assignment.last_name}`}</span>  <span>{assignment.module_name}</span>
+                    <span style={{ fontWeight: 'bold' }}>{`${assignment.first_name} ${assignment.last_name}`}</span>  <span style={{ fontWeight: 'bold' }}>{assignment.module_name}</span>
                     <span style={{ 
                         padding: '5px 10px', 
                         borderRadius: '5px', 
