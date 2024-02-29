@@ -81,7 +81,7 @@ router.get('/badges/organization/:organizationId', (req, res) => {
     const organizationId = req.params.organizationId;
     
     const qry = `
-        SELECT users.user_id, users.first_name, users.last_name, users.email, user_badges.badge_id, badges.badge_name, badges.image_path
+        SELECT users.user_id, users.first_name, users.last_name, users.email, user_badges.badge_id, badges.badge_name, badges.image_path, user_badges.earned_date
         FROM users
         INNER JOIN user_badges ON users.user_id = user_badges.user_id
         INNER JOIN badges ON user_badges.badge_id = badges.badge_id
@@ -94,14 +94,15 @@ router.get('/badges/organization/:organizationId', (req, res) => {
             return res.status(500).json({ error: 'Internal Server Error', details: err });
         }
         
-        // Process result to group badges by user
+        // Process result to group badges by user and include earned_date
         const employees = result.reduce((acc, curr) => {
             const userIndex = acc.findIndex(user => user.user_id === curr.user_id);
             if (userIndex > -1) {
                 acc[userIndex].badges.push({
                     badge_id: curr.badge_id,
                     badge_name: curr.badge_name,
-                    image_path: curr.image_path
+                    image_path: curr.image_path,
+                    earned_date: curr.earned_date // Include earned_date in each badge object
                 });
             } else {
                 acc.push({
@@ -112,7 +113,8 @@ router.get('/badges/organization/:organizationId', (req, res) => {
                     badges: [{
                         badge_id: curr.badge_id,
                         badge_name: curr.badge_name,
-                        image_path: curr.image_path
+                        image_path: curr.image_path,
+                        earned_date: curr.earned_date // Include earned_date
                     }]
                 });
             }
@@ -167,10 +169,11 @@ router.post('/update-password', (req, res) => {
 
 router.post('/add-badge', (req, res) => {
     const { userId, badgeId } = req.body;
+    const earnedDate = new Date().toISOString().slice(0, 10); // Get today's date in YYYY-MM-DD format
 
-    const insertSql = 'INSERT INTO user_badges (user_id, badge_id) VALUES (?, ?) ON DUPLICATE KEY UPDATE badge_id=badge_id';
+    const insertSql = 'INSERT INTO user_badges (user_id, badge_id, earned_date) VALUES (?, ?, ?) ON DUPLICATE KEY UPDATE badge_id=badge_id, earned_date=VALUES(earned_date)';
 
-    pool.query(insertSql, [userId, badgeId], (err, result) => {
+    pool.query(insertSql, [userId, badgeId, earnedDate], (err, result) => {
         if (err) {
             console.error('Error adding badge to user:', err);
             return res.status(500).json({ error: 'Failed to add badge to user' });

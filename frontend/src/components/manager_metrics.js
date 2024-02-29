@@ -196,6 +196,34 @@ function TrainingModulesPage() {
             </ul>
         </div>
 
+
+
+        <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', color: '#343a40', marginTop: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+            <h3>Employee Badge Information:</h3>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '15px' }}>
+                {employees.map(employee => (
+                <div key={employee.user_id} style={{ background: 'white', borderRadius: '5px', padding: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
+                    <h4 style={{ margin: '0 0 10px 0' }}>{employee.first_name} {employee.last_name}</h4>
+                    <p style={{ margin: '0' }}>Email: {employee.email}</p>
+                    <p style={{ margin: '0' }}>User ID: {employee.user_id}</p>
+                    <div style={{ marginTop: '10px' }}>
+                    {employee.badges && employee.badges.map(badge => (
+                        <div key={badge.badge_id} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '10px' }}>
+                            <span style={{ display: 'inline-block', background: '#e9ecef', borderRadius: '5px', padding: '5px 10px', marginRight: '5px', marginBottom: '5px', fontSize: '14px' }}>
+                            {badge.badge_name}
+                            </span>
+                            {/* Display the earned date below each badge */}
+                            <span style={{ fontSize: '12px', color: '#6c757d' }}>
+                                Earned on: {new Date(badge.earned_date).toLocaleDateString()}
+                            </span>
+                        </div>
+                    ))}
+                    </div>
+                </div>
+                ))}
+            </div>
+        </div>
+
           <div style={{ marginTop: '20px', backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
             <h2>Enroll Employees in Training</h2>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px' }}>

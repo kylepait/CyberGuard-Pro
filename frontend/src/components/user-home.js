@@ -90,7 +90,7 @@ function UserHome() {
       try {
         const response = await fetch(`http://localhost:4000/badges/organization/${user.organization_id}`);
         const data = await response.json();
-        setEmployees(data); // Assuming the endpoint returns structured data as discussed
+        setEmployees(data); // Assuming the endpoint returns structured data
         setLoading(false); // Set loading to false after fetching data
       } catch (error) {
         console.error('Error fetching employee badges:', error);

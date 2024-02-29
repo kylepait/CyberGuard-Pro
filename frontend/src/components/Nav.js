@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 function Nav() {
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark top">
-            <Link to="/" className="navbar-brand">Welcome to CyberGuard Pro</Link>
+            <Link to="/" className="navbar-brand">WELCOME TO CYBERGUARD PRO</Link>
             <button className="navbar-toggler" type="button" data-toggle="collapse" data-target="#navMainMenu" aria-controls="navMainMenu" aria-expanded="false" aria-label="Toggle navigation">
                 <span className="navbar-toggler-icon"></span>
             </button>
