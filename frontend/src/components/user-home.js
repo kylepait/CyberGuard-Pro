@@ -132,6 +132,12 @@ function UserHome() {
         </Link>
     )}
 
+    {user.user_role === 'dev' && (
+        <Link to='/dev_hub' style={{ margin: '10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
+          Developer Hub
+        </Link>
+    )}
+
     <div style={{ display: 'flex', marginBottom: '20px', gap: '20px' }}>
       <div style={{ 
           flex: 1, 
