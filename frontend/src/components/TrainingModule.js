@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link, useNavigate  } from 'react-router-dom';
 
 function TrainingModulesPage() {
   const [assignedModules, setAssignedModules] = useState([]);
@@ -121,6 +122,13 @@ function TrainingModulesPage() {
 
 
   return (
+    
+    <div style={{ margin: '20px', fontFamily: 'Arial, sans-serif' }}>
+
+    <Link to='/user-home' style={{ margin: '10px 10px 10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
+      Home Page
+    </Link>
+
     <div style={{ padding: '20px' }}>
       <h2>Assigned Training Modules</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(800px, 1fr))', gap: '20px' }}>
@@ -201,7 +209,7 @@ function TrainingModulesPage() {
         </>
       )}
     </div>
-
+    </div>
     
   );
 }
