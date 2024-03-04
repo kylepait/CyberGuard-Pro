@@ -188,7 +188,7 @@ function UserHome() {
       </button>
       {generatedPassword && (
         <>
-          <p>Generated Password: <strong>{generatedPassword}</strong></p>
+          <p data-testid="generatedPassword">Generated Password: <strong>{generatedPassword}</strong></p>
           <button onClick={updatePassword} style={{ padding: '10px 15px', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}>
             Set as My New Password
           </button>

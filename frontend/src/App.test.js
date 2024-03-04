@@ -1,8 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import App from './App';
 
-test('renders learn react link', () => {
+
+import { render, screen } from '@testing-library/react';
+import App from './App';
+
+test('renders App and checks for Nav component', () => {
   render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
+  const navElement = screen.getByText(/Login/i); // Assuming "Login" link text is part of your Nav component
+  expect(navElement).toBeInTheDocument();
 });
