@@ -6,6 +6,7 @@ import UserHome from './components/user-home';
 import TrainingModule from './components/TrainingModule';
 import ManagerMetrics from './components/manager_metrics';
 import DevHub from './components/dev_hub';
+import TriviaGame from './components/triviaGame';
 
 
 import Nav from './components/Nav';
@@ -24,6 +25,8 @@ function App() {
             <Route path="/TrainingModule" element={<TrainingModule/>} />
             <Route path="/manager_metrics" element={<ManagerMetrics/>} />
             <Route path="/dev_hub" element={<DevHub/>} />
+            <Route path="/triviaGame" element={<TriviaGame/>} />
+
           </Routes>
       </div>
     </Router>

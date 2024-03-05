@@ -12,6 +12,9 @@ function UserHome() {
   const [generatedPassword, setGeneratedPassword] = useState('');
 
 
+  
+
+
   const generatePassword = (length = 12) => {
     const charset = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+=-';
     let password = '';
@@ -124,6 +127,10 @@ function UserHome() {
 
     <Link to='/TrainingModule' style={{ margin: '10px 10px 10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
       Training Page
+    </Link>
+
+    <Link to='/triviaGame' style={{ margin: '10px 10px 10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
+      Test Your Knowledge!
     </Link>
 
     {user.user_role === 'management' && (
