@@ -36,3 +36,52 @@
     transform: rotate(360deg);
   }
 }
+
+.app {
+  max-width: 600px;
+  margin: auto;
+  text-align: center;
+}
+
+.question-section, .score-section {
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.question-count, .question-text {
+  margin-bottom: 20px;
+}
+
+.answer-section {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+button {
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.score-section {
+  font-size: 20px;
+}
+
+.play-again-button {
+  background-color: #28a745;
+  margin-top: 20px;
+}
+
