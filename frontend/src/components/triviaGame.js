@@ -1,10 +1,31 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import questions from './questions.json';
 
 const TriviaGame = () => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [showScore, setShowScore] = useState(false);
+  const user = JSON.parse(localStorage.getItem('user'));
+
+  const awardPerfectScoreBadge = async () => {
+    const badgeId = '10'; 
+    try {
+      const response = await fetch('http://localhost:4000/add-badge', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.user_id, badgeId }),
+      });
+
+      const data = await response.json();
+      if (!data.success) {
+        console.error('Failed to award perfect score badge.');
+      }
+    } catch (error) {
+      console.error('Error awarding perfect score badge:', error);
+    }
+  };
 
   const handleAnswerOptionClick = (isCorrect) => {
     if (isCorrect) {
@@ -16,6 +37,9 @@ const TriviaGame = () => {
       setCurrentQuestionIndex(nextQuestion);
     } else {
       setShowScore(true);
+      if (score + 1 === questions.length) { // Plus one because we haven't updated the state yet
+        awardPerfectScoreBadge();
+      }
     }
   };
 
