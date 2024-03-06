@@ -19,9 +19,6 @@ function TrainingModulesPage() {
   
 
   const [badges, setBadges] = useState([]);
-
-  // used for the leaderboard
-  const[employeeScore, setEmployeeScore] = useState([]);
   
   const [loading, setLoading] = useState(true);
   
@@ -100,20 +97,6 @@ function TrainingModulesPage() {
       // Call fetchBadges for all users
       fetchBadges();
       fetchEmployeeBadges();
-
-      const fetchEmployeePerformance = async () => {
-        try {
-          const response = await fetch(`http://localhost:4000/employee-performance/organization/${user.organization_id}`);
-          const data = await response.json();
-          setEmployeeScore(data);
-          setLoading(false);
-        } catch (error) {
-          console.error('Error fetching employee performance:', error);
-          setLoading(false);
-        }
-      };
-
-      fetchEmployeePerformance();
 
     }, [user.user_id, user.user_role, user.organization_id]);
 
@@ -240,7 +223,7 @@ function TrainingModulesPage() {
           <h3>Employee Leaderboard:</h3>
           <ul style={{ listStyleType: 'none', paddingLeft: '0', marginTop: '20px' }}>
             {employees
-              .sort((a, b) => (employeeScore.find(score => score.user_id === b.user_id)?.score || 0) - (employeeScore.find(score => score.user_id === a.user_id)?.score || 0))
+              .sort((a, b) => (Array.isArray(b.badges) ? b.badges.length : 0) - (Array.isArray(a.badges) ? a.badges.length : 0))
               .map((employee, index) => (
                 <li key={employee.user_id} style={{
                   padding: '10px',
@@ -258,12 +241,14 @@ function TrainingModulesPage() {
                     <p style={{ margin: '0', fontSize: '12px' }}>User ID: {employee.user_id}</p>
                   </div>
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    <p style={{ margin: '0' }}>Score: {employeeScore.find(score => score.user_id === employee.user_id)?.score || 0}</p>
+                    {/* Display the badge count as the score */}
+                    <p style={{ margin: '0' }}>Score: {Array.isArray(employee.badges) ? employee.badges.length : 0}</p>
                   </div>
                 </li>
               ))}
           </ul>
         </div>
+
 
 
 
