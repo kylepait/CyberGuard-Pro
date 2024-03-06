@@ -85,3 +85,30 @@ button:hover {
   margin-top: 20px;
 }
 
+input[type="password"] {
+  padding: 10px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.strength-meter > div {
+  height: 10px;
+  border-radius: 5px;
+}
+
+.weak > div {
+  width: 33%;
+  background-color: red;
+}
+
+.medium > div {
+  width: 66%;
+  background-color: yellow;
+}
+
+.strong > div {
+  width: 100%;
+  background-color: green;
+}
+
