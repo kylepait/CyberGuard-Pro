@@ -50,6 +50,40 @@ function UserHome() {
     }
   };
 
+  const [passwordStrength, setPasswordStrength] = useState('');
+  const [userPassword, setUserPassword] = useState('');
+
+  const checkPasswordStrength = (password) => {
+    let strength = 0;
+    if (password.length >= 8) strength += 1; // Length at least 8
+    if (/[A-Z]/.test(password)) strength += 1; // Uppercase letters
+    if (/[a-z]/.test(password)) strength += 1; // Lowercase letters
+    if (/[0-9]/.test(password)) strength += 1; // Digits
+    if (/[^A-Za-z0-9]/.test(password)) strength += 1; // Special characters
+
+    switch (strength) {
+      case 0:
+      case 1:
+        return "Very Weak";
+      case 2:
+        return "Weak";
+      case 3:
+        return "Moderate";
+      case 4:
+        return "Strong";
+      case 5:
+        return "Very Strong";
+      default:
+        return "Unknown";
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    const password = e.target.value;
+    setUserPassword(password);
+    setPasswordStrength(checkPasswordStrength(password));
+  };
+
   const awardBadge = async (badgeId) => {
     try {
       const response = await fetch('http://localhost:4000/add-badge', {
@@ -201,7 +235,25 @@ function UserHome() {
           </button>
         </>
       )}
+
+
+
     </div>
+
+    <input 
+          type="password" 
+          value={userPassword} 
+          onChange={handlePasswordChange} 
+          placeholder="Test Your Password"
+        />
+
+        <div className={`strength-meter ${passwordStrength}`}>
+            <div className={`${passwordStrength}`}></div>
+        </div>
+        <div>Password Strength: {passwordStrength}</div>
+
+
+
 
       {user.user_role === 'management' && (
         <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', color: '#343a40', marginTop: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
