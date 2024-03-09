@@ -342,6 +342,31 @@ router.post('/enroll-employee-training', (req, res) => {
     });
 });
 
+
+router.delete('/unenroll-employee-training', (req, res) => {
+    const { employeeUserId, moduleId } = req.body;
+    const managerId = req.managerId; // Determine managerId based on session or token
+
+    // Check if the employee belongs to the manager's organization
+    // and if the moduleId is valid, then proceed with unenrollment
+
+    const qry = 'DELETE FROM user_training_modules WHERE user_id = ? AND module_id = ? AND status = "assigned"';
+    pool.query(qry, [employeeUserId, moduleId], (err, results) => {
+        if (err) {
+            console.error('Error unenrolling employee from training module:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        // Check if any rows were affected to determine if the unenrollment was successful
+        if (results.affectedRows > 0) {
+            res.json({ success: true, message: 'Employee unenrolled from training module successfully' });
+        } else {
+            res.status(400).json({ error: 'Invalid request. Employee may not be assigned to the specified module or the module is already completed.' });
+        }
+    });
+});
+
+
 router.get('/employees/organization/:organizationId', (req, res) => {
     const organizationId = req.params.organizationId;
     
