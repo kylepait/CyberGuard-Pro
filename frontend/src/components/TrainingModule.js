@@ -137,16 +137,30 @@ function TrainingModulesPage() {
         {assignedModules.map(module => (
           <div key={module.module_id} style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', padding: '20px', borderRadius: '10px', height: '550px' }}>
             <h3>{module.module_name}</h3>
-            <iframe src={module.module_link} width="100%" height="400" title={module.module_name} style={{ border: 'none', marginBottom: '10px' }}></iframe>
+            <iframe src={module.module_link} width="100%" height="400" title={module.module_type} style={{ border: 'none', marginBottom: '10px' }}></iframe>
+            {module.module_format === 'slides' && (
+            <>
             <button
-              onClick={() => completeTraining(module.module_id)}
-              style={{ backgroundColor: 'green', color: 'white', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', border: 'none', width: '100%' }}>
-              I attest to completing this training
+                  onClick={() => completeTraining(module.module_id)}
+                  style={{ backgroundColor: 'green', color: 'white', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', border: 'none', width: '100%' }}>
+                  I attest to completing this training
             </button>
+            </>
+            )}
+            {module.module_format === 'password' && (
+            <>
+            <button
+                  onClick={() => completeTraining(module.module_id)}
+                  style={{ backgroundColor: 'green', color: 'white', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', border: 'none', width: '100%' }}>
+                  My password has at least 1 capital letter and 1 number
+            </button>
+            </>
+            )}
           </div>
         ))}
       </div>
-  
+
+      
       <h2 style={{ marginTop: '40px' }}>Completed Training Modules</h2>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '20px' }}>
         {completedModules.map(module => (

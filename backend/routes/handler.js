@@ -186,7 +186,7 @@ router.get('/user-training-modules', (req, res) => {
     const userId = req.query.userId;
 
     const qry = `
-        SELECT tm.module_id, tm.module_name, tm.module_link, utm.status
+        SELECT tm.module_id, tm.module_name, tm.module_link, utm.status, tm.module_format
         FROM user_training_modules utm
         JOIN training_modules tm ON utm.module_id = tm.module_id
         WHERE utm.user_id = ?;
