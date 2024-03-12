@@ -121,6 +121,17 @@ function TrainingModulesPage() {
     }
   };
 
+  const gradePassword = async (moduleId) => {
+  var pass = document.getElementById("password");
+  if (pass.value.length > 3)
+  {
+    completeTraining(moduleId);
+  }
+  else
+  {
+    alert('password is too weak');
+  }
+  }
 
 
   return (
@@ -149,10 +160,14 @@ function TrainingModulesPage() {
             )}
             {module.module_format === 'password' && (
             <>
+            <input
+                  type="password" id="password" placeholder="Password">
+            </input>
             <button
-                  onClick={() => completeTraining(module.module_id)}
+                              
+                  onClick={() => gradePassword(module.module_id)}
                   style={{ backgroundColor: 'green', color: 'white', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', border: 'none', width: '100%' }}>
-                  My password has at least 1 capital letter and 1 number
+                  This will be my password for the shown website
             </button>
             </>
             )}
