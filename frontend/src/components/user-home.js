@@ -190,7 +190,7 @@ function UserHome() {
           flexDirection: 'column',
           gap: '10px' }}>
           
-          <h2 style={{ margin: '0 0 10px 0', borderBottom: '2px solid #007bff', paddingBottom: '5px' }}>
+          <h2 style={{ margin: '0 0 10px 0', paddingBottom: '5px' }}>
               Welcome, {user.username}!
           </h2>
           
