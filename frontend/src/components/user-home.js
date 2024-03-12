@@ -241,19 +241,29 @@ function UserHome() {
     </div>
 
     <input 
-          type="password" 
-          value={userPassword} 
-          onChange={handlePasswordChange} 
-          placeholder="Test Your Password"
-        />
+    type="password" 
+    value={userPassword} 
+    onChange={handlePasswordChange} 
+    placeholder="Test Your Password"
+/>
 
-        <div className={`strength-meter ${passwordStrength}`}>
-            <div className={`${passwordStrength}`}></div>
-        </div>
-        <div>Password Strength: {passwordStrength}</div>
-
-
-
+      <div className="strength-meter">
+          <div style={{
+              width: passwordStrength === "Very Weak" ? "20%" :
+                    passwordStrength === "Weak" ? "40%" :
+                    passwordStrength === "Moderate" ? "60%" :
+                    passwordStrength === "Strong" ? "80%" : 
+                    passwordStrength === "Very Strong" ? "100%" : "0%",
+              backgroundColor: passwordStrength === "Very Weak" ? "#ff3e3e" :
+                              passwordStrength === "Weak" ? "#ffae00" :
+                              passwordStrength === "Moderate" ? "#f7ff00" :
+                              passwordStrength === "Strong" ? "#90ee90" :
+                              passwordStrength === "Very Strong" ? "#008000" : "#dddddd",
+              height: "10px",
+              borderRadius: "5px"
+          }}></div>
+      </div>
+      <div>Password Strength: {passwordStrength}</div>
 
       {user.user_role === 'management' && (
         <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', color: '#343a40', marginTop: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>

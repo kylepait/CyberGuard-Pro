@@ -222,30 +222,29 @@ function TrainingModulesPage() {
         <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', color: '#343a40', marginTop: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
           <h3>Employee Leaderboard:</h3>
           <ul style={{ listStyleType: 'none', paddingLeft: '0', marginTop: '20px' }}>
-            {employees
-              .sort((a, b) => (Array.isArray(b.badges) ? b.badges.length : 0) - (Array.isArray(a.badges) ? a.badges.length : 0))
-              .map((employee, index) => (
-                <li key={employee.user_id} style={{
-                  padding: '10px',
-                  marginBottom: '10px',
-                  backgroundColor: '#ffffff',
-                  borderRadius: '5px',
-                  boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                }}>
-                  <span style={{ fontWeight: 'bold' }}>{index + 1}</span>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: '10px' }}>
-                    <p style={{ fontWeight: 'bold', margin: '0' }}>{employee.first_name} {employee.last_name}</p>
-                    <p style={{ margin: '0', fontSize: '12px' }}>User ID: {employee.user_id}</p>
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                    {/* Display the badge count as the score */}
-                    <p style={{ margin: '0' }}>Score: {Array.isArray(employee.badges) ? employee.badges.length : 0}</p>
-                  </div>
-                </li>
-              ))}
+          {employees
+            .sort((a, b) => (Array.isArray(b.badges) ? b.badges.length : 0) - (Array.isArray(a.badges) ? a.badges.length : 0))
+            .map((employee, index) => (
+              <li key={employee.user_id} style={{
+                padding: '10px',
+                marginBottom: '10px',
+                backgroundColor: index === 0 ? '#ffd700' : index === 1 ? '#c0c0c0' : index === 2 ? '#cd7f32' : '#ffffff',
+                borderRadius: '5px',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}>
+                <span style={{ fontWeight: 'bold' }}>{index + 1}</span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: '10px' }}>
+                  <p style={{ fontWeight: 'bold', margin: '0' }}>{employee.first_name} {employee.last_name}</p>
+                  <p style={{ margin: '0', fontSize: '12px' }}>User ID: {employee.user_id}</p>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                  <p style={{ margin: '0' }}>Score: {Array.isArray(employee.badges) ? employee.badges.length : 0}</p>
+                </div>
+              </li>
+            ))}
           </ul>
         </div>
 
