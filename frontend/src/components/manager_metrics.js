@@ -16,7 +16,8 @@ function TrainingModulesPage() {
 
   const [employees, setEmployees] = useState([]);
 
-  
+  const [selectedUnenrollEmployee, setSelectedUnenrollEmployee] = useState('');
+  const [selectedUnenrollModule, setSelectedUnenrollModule] = useState('');
 
   const [badges, setBadges] = useState([]);
   
@@ -40,8 +41,23 @@ function TrainingModulesPage() {
       }
   };
 
+  const unenrollEmployeeFromTraining = async () => {
+    const response = await fetch('http://localhost:4000/unenroll-employee-training', {
+      method: 'DELETE',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ employeeUserId: selectedUnenrollEmployee, moduleId: selectedUnenrollModule })
+    });
+    const data = await response.json();
 
-
+    if (data.success) {
+      alert('Employee unenrolled successfully!');
+      // Optionally: Refresh the list of enrolled trainings
+      fetchTrainingAssignments(); // Call this function to refresh assignments
+    } else {
+      alert('Failed to unenroll employee.');
+    }
+  
+  };
 
 
 
@@ -119,6 +135,11 @@ function TrainingModulesPage() {
   const fetchTrainingModules = async () => {
     const response = await fetch(`http://localhost:4000/user-training-modules?userId=${user.user_id}`);
     const data = await response.json();
+
+    // Filter assigned and completed modules
+    const assignedModules = data.assignedModules.filter(module => module.status === 'assigned');
+    const completedModules = data.completedModules;
+
     setAssignedModules(data.assignedModules);
     setCompletedModules(data.completedModules);
   };
@@ -248,29 +269,50 @@ function TrainingModulesPage() {
           </ul>
         </div>
 
+        
 
-
-
-          <div style={{ marginTop: '20px', backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+        
+        <div style={{ marginTop: '20px', backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px'}}>
             <h2>Enroll Employees in Training</h2>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px' }}>
-              <select value={selectedEmployee} onChange={e => setSelectedEmployee(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
-                <option value="">Select Employee</option>
-                {employees.map(employee => (
-                  <option key={employee.user_id} value={employee.user_id}>{employee.first_name} {employee.last_name}</option>
-                ))}
-              </select>
-              <select value={selectedModule} onChange={e => setSelectedModule(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
-                <option value="">Select Training Module</option>
-                {allTrainings.map(module => (
-                  <option key={module.module_id} value={module.module_id}>{module.module_name}</option>
-                ))}
-              </select>
-              <button onClick={enrollEmployeeInTraining} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px', cursor: 'pointer', border: 'none' }}>
-                Enroll Employee
-              </button>
-            </div>
+            <select value={selectedEmployee} onChange={e => setSelectedEmployee(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+              <option value="">Select Employee</option>
+              {employees.map(employee => (
+                <option key={employee.user_id} value={employee.user_id}>{employee.first_name} {employee.last_name}</option>
+              ))}
+            </select>
+            <select value={selectedModule} onChange={e => setSelectedModule(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+              <option value="">Select Training Module</option>
+              {allTrainings.map(module => (
+                <option key={module.module_id} value={module.module_id}>{module.module_name}</option>
+              ))}
+            </select>
+            <button onClick={enrollEmployeeInTraining} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px', cursor: 'pointer', border: 'none' }}>
+              Enroll Employee
+            </button>
           </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px' }}>
+            <h2>Unenroll Employees from Training</h2>
+            <select value={selectedUnenrollEmployee} onChange={e => setSelectedUnenrollEmployee(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+              <option value="">Select Employee</option>
+              {employees.map(employee => (
+                <option key={employee.user_id} value={employee.user_id}>{employee.first_name} {employee.last_name}</option>
+              ))}
+            </select>
+            <select value={selectedUnenrollModule} onChange={e => setSelectedUnenrollModule(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+              <option value="">Select Training Module</option>
+              {assignedModules
+                .filter(module => module.status === 'assigned') // Filter out completed modules
+                .map(module => (
+                  <option key={module.module_id} value={module.module_id}>{module.module_name}</option>
+              ))}
+            </select>
+            <button onClick={unenrollEmployeeFromTraining} style={{ padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', borderRadius: '5px', cursor: 'pointer', border: 'none' }}>
+              Unenroll Employee
+            </button>
+          </div>
+        </div>
+
         </>
     </div>
 
