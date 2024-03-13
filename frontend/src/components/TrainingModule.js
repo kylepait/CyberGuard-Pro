@@ -163,12 +163,13 @@ function TrainingModulesPage() {
             <input
                   type="password" id="password" placeholder="Password">
             </input>
-            <button
-                              
+            <button 
                   onClick={() => gradePassword(module.module_id)}
                   style={{ backgroundColor: 'green', color: 'white', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', border: 'none', width: '100%' }}>
                   This will be my password for the shown website
             </button>
+            
+            
             </>
             )}
           </div>
