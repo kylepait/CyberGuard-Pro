@@ -3,6 +3,8 @@ const router = express.Router();
 const pool = require('../config/db.js');
 const cors = require('cors')
 const bodyParser = require('body-parser');
+const util = require('util');
+
 
 // Use cors middleware
 router.use(cors());
@@ -382,5 +384,31 @@ router.get('/employees/organization/:organizationId', (req, res) => {
     });
 });
 
+
+router.post('/submit-quiz', async (req, res) => {
+    const { userId, moduleId, score } = req.body;
+    
+    // Convert pool.query into a function returning a promise
+    // Skip this step if you're already using a promise-based approach with your pool
+    const query = util.promisify(pool.query).bind(pool);
+    
+    const updateQuery = `
+        INSERT INTO user_training_modules (user_id, module_id, score)
+        VALUES (?, ?, ?)
+        ON DUPLICATE KEY UPDATE score = GREATEST(score, VALUES(score));
+    `;
+    
+    try {
+        // Execute the query
+        await query(updateQuery, [userId, moduleId, score]);
+        res.json({ success: true, message: 'Quiz score updated successfully.' });
+    } catch (err) {
+        console.error('Error updating quiz score:', err);
+        res.status(500).json({ error: 'Internal Server Error', details: err.message });
+    }
+});
+
+  
+  
 
 module.exports = router;

@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate  } from 'react-router-dom';
 
+import QuizPopup from './QuizPopup'; // Assuming this is the Quiz component you will create
+
+
 ///Testing out opening a new branch. I've been working main thus far
 
 function TrainingModulesPage() {
@@ -19,6 +22,9 @@ function TrainingModulesPage() {
 
   const [employees, setEmployees] = useState([]);
 
+  const [showQuiz, setShowQuiz] = useState(false); // New state to control quiz popup visibility
+  const [currentModuleId, setCurrentModuleId] = useState(null); // State to hold the current module ID for which the quiz is being taken
+
   const enrollEmployeeInTraining = async () => {
       const response = await fetch('http://localhost:4000/enroll-employee-training', {
           method: 'POST',
@@ -34,6 +40,34 @@ function TrainingModulesPage() {
       } else {
           alert('Failed to enroll employee.');
       }
+  };
+
+
+  const openQuiz = (moduleId) => {
+    setCurrentModuleId(moduleId);
+    setShowQuiz(true);
+  };
+
+  // Function to close quiz popup
+  const closeQuiz = () => {
+    setShowQuiz(false);
+  };
+
+  // Function to handle quiz submission
+  const submitQuiz = async (score) => {
+    const response = await fetch('/submit-quiz', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.user_id, moduleId: currentModuleId, score })
+    });
+    const data = await response.json();
+    if (data.success) {
+      alert('Quiz submitted successfully!');
+      closeQuiz();
+      // Optionally refresh the module list here
+    } else {
+      alert('Failed to submit quiz.');
+    }
   };
 
 
@@ -144,6 +178,13 @@ function TrainingModulesPage() {
 
     <div style={{ padding: '20px' }}>
       <h2>Assigned Training Modules</h2>
+
+      <div>
+       
+        {showQuiz && <QuizPopup onClose={closeQuiz} onSubmit={submitQuiz} />}
+      </div>
+
+
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(800px, 1fr))', gap: '20px' }}>
         {assignedModules.map(module => (
           <div key={module.module_id} style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', padding: '20px', borderRadius: '10px', height: '550px' }}>
