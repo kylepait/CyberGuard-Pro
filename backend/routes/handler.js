@@ -345,6 +345,26 @@ router.post('/enroll-employee-training', (req, res) => {
     });
 });
 
+router.get('/enroll-modules/:selectedOption', (req, res) => {
+    const selectedOption = req.params.selectedOption;
+    
+    const qry = `
+        SELECT tm.module_id, tm.module_name
+        FROM training_modules tm
+        WHERE NOT EXISTS (
+            SELECT * 
+            FROM user_training_modules utm 
+            WHERE tm.module_id = utm.module_id 
+            AND utm.user_id = ?);
+    `;
+    pool.query(qry, [selectedOption], (err, results) => {
+        if (err) {
+            console.error('Error fetching training modules:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json(results);
+    });
+});
 
 router.get('/unenroll-modules/:selectedOption', (req, res) => {
     const selectedOption = req.params.selectedOption;

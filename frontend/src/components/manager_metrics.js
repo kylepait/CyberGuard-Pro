@@ -11,8 +11,10 @@ function TrainingModulesPage() {
   const user = JSON.parse(localStorage.getItem('user'));
 
 
-  const [selectedEmployee, setSelectedEmployee] = useState('');
-  const [selectedModule, setSelectedModule] = useState('');
+  const [selectedEnrollEmployee, setSelectedEnrollEmployee] = useState('');
+  const [selectedEnrollModule, setSelectedEnrollModule] = useState('');
+  const [dropdownEnrollEmployee, setDropdownEnrollEmployee] = useState([]);
+  const [dropdownEnrollModule, setDropdownEnrollModule] = useState([]);
 
   const [employees, setEmployees] = useState([]);
 
@@ -30,7 +32,7 @@ function TrainingModulesPage() {
       const response = await fetch('http://localhost:4000/enroll-employee-training', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ employeeUserId: selectedEmployee, moduleId: selectedModule })
+          body: JSON.stringify({ employeeUserId: selectedEnrollEmployee, moduleId: selectedEnrollModule })
       });
       const data = await response.json();
       if (data.success) {
@@ -116,6 +118,7 @@ function TrainingModulesPage() {
       fetchBadges();
       fetchEmployeeBadges();
 
+      fetchEnrollEmployees();
       fetchUnenrollEmployees();
 
     }, [user.user_id, user.user_role, user.organization_id]);
@@ -144,12 +147,35 @@ function TrainingModulesPage() {
     setCompletedModules(data.completedModules);
   };
 
+  const fetchEnrollEmployees = async () => {
+    const response = await fetch(`http://localhost:4000/employees/organization/${user.organization_id}`);
+    const data = await response.json();
+
+    setDropdownEnrollEmployee(data);
+    console.log(data);
+  };
+  
+  
   const fetchUnenrollEmployees = async () => {
     const response = await fetch(`http://localhost:4000/employees/organization/${user.organization_id}`);
     const data = await response.json();
 
     setDropdownUnenrollEmployee(data);
     console.log(data);
+  };
+  
+  const handleEnrollEmployeeChange = async (event) => {
+    const selectedValue = event.target.value;
+    try {
+        const response = await fetch(`http://localhost:4000/enroll-modules/${selectedValue}`);
+        const data = await response.json();
+        setSelectedEnrollEmployee(selectedValue);
+        setDropdownEnrollModule(data);
+        console.log(data);
+        console.log(selectedValue);
+    } catch (error) {
+        console.error('Error fetching enroll module data:', error);
+    }
   };
   
   const handleUnenrollEmployeeChange = async (event) => {
@@ -164,13 +190,21 @@ function TrainingModulesPage() {
     } catch (error) {
         console.error('Error fetching unenroll module data:', error);
     }
-};
+  };
+
+  const handleEnrollModuleChange = async (event) => {
+    const selectedValue = event.target.value;
+    
+    setSelectedEnrollModule(selectedValue);
+  };
 
   const handleUnenrollModuleChange = async (event) => {
     const selectedValue = event.target.value;
     
     setSelectedUnenrollModule(selectedValue);
   };
+
+
   
 
   return (
@@ -300,16 +334,16 @@ function TrainingModulesPage() {
         <div style={{ marginTop: '20px', backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '20px' }}>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px'}}>
             <h2>Enroll Employees in Training</h2>
-            <select value={selectedEmployee} onChange={e => setSelectedEmployee(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+            <select value={selectedEnrollEmployee} onChange={handleEnrollEmployeeChange} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
               <option value="">Select Employee</option>
               {employees.map(employee => (
                 <option key={employee.user_id} value={employee.user_id}>{employee.first_name} {employee.last_name}</option>
               ))}
             </select>
-            <select value={selectedModule} onChange={e => setSelectedModule(e.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+            <select value={selectedEnrollModule} onChange={handleEnrollModuleChange} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
               <option value="">Select Training Module</option>
-              {allTrainings.map(module => (
-                <option key={module.module_id} value={module.module_id}>{module.module_name}</option>
+              {dropdownEnrollModule.map((option) => (
+                <option key={option.module_id} value={option.module_id}>{option.module_name}</option>
               ))}
             </select>
             <button onClick={enrollEmployeeInTraining} style={{ padding: '10px 20px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px', cursor: 'pointer', border: 'none' }}>
@@ -319,15 +353,13 @@ function TrainingModulesPage() {
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px' }}>
             <h2>Unenroll Employees from Training</h2>
-            <select value={selectedUnenrollEmployee} onChange={handleUnenrollEmployeeChange}
-            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+            <select value={selectedUnenrollEmployee} onChange={handleUnenrollEmployeeChange} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
               <option value="">Select Employee</option>
               {employees.map((employee) => (
                 <option key={employee.user_id} value={employee.user_id}>{employee.first_name} {employee.last_name}</option>
               ))}
             </select>
-            <select value={selectedUnenrollModule} onChange={handleUnenrollModuleChange} 
-            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+            <select value={selectedUnenrollModule} onChange={handleUnenrollModuleChange} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
             <option value="">Select Training Module</option>
               {dropdownUnenrollModule.map((option) => (
                   <option key={option.module_id} value={option.module_id}>{option.module_name}</option>
