@@ -3,6 +3,8 @@ const router = express.Router();
 const pool = require('../config/db.js');
 const cors = require('cors')
 const bodyParser = require('body-parser');
+const util = require('util');
+
 
 // Use cors middleware
 router.use(cors());
