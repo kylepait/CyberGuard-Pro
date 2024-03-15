@@ -16,10 +16,10 @@ function TrainingModulesPage() {
 
   const [employees, setEmployees] = useState([]);
 
-  const [dropdownUnenrollEmployee, setDropdownUnenrollEmployee] = useState([]);
-  const [dropdownUnenrollModule, setDropdownUnenrollModule] = useState([]);
   const [selectedUnenrollEmployee, setSelectedUnenrollEmployee] = useState('');
   const [selectedUnenrollModule, setSelectedUnenrollModule] = useState('');
+  const [dropdownUnenrollEmployee, setDropdownUnenrollEmployee] = useState([]);
+  const [dropdownUnenrollModule, setDropdownUnenrollModule] = useState([]);
   
   const [badges, setBadges] = useState([]);
   
@@ -152,23 +152,23 @@ function TrainingModulesPage() {
     console.log(data);
   };
   
-  const handleUnenrollEmployeeChange = (event) => {
+  const handleUnenrollEmployeeChange = async (event) => {
     const selectedValue = event.target.value;
-    setSelectedUnenrollEmployee(selectedValue);
-    fetch(`/unenroll-modules/${selectedValue}`)
-      .then((response) => response.json())
-      .then((data) => {
-        const firstModule = data[0];
-        setSelectedUnenrollModule(data);
+    try {
+        const response = await fetch(`http://localhost:4000/unenroll-modules/${selectedValue}`);
+        const data = await response.json();
+        setSelectedUnenrollEmployee(selectedValue);
+        setDropdownUnenrollModule(data);
         console.log(data);
+        console.log(selectedValue);
+    } catch (error) {
+        console.error('Error fetching unenroll module data:', error);
+    }
+};
 
-      });
-
-      console.log(selectedValue);
-  };
-
-  const handleUnenrollModuleChange = (event) => {
+  const handleUnenrollModuleChange = async (event) => {
     const selectedValue = event.target.value;
+    
     setSelectedUnenrollModule(selectedValue);
   };
   
