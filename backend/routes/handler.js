@@ -208,6 +208,7 @@ router.get('/user-training-modules', (req, res) => {
     });
 });
 
+
 router.post('/complete-training', async (req, res) => {
     const { userId, moduleId } = req.body;
 
@@ -289,7 +290,7 @@ router.post('/complete-training', async (req, res) => {
 router.get('/training-assignments/:organizationId', (req, res) => {
     const organizationId = req.params.organizationId;
     const qry = `
-        SELECT utm.user_id, u.username, u.first_name, u.last_name, tm.module_name, utm.status
+        SELECT utm.user_id, u.username, u.first_name, u.last_name, utm.module_id, tm.module_name, utm.status
         FROM user_training_modules utm
         JOIN users u ON utm.user_id = u.user_id
         JOIN training_modules tm ON utm.module_id = tm.module_id
@@ -341,6 +342,25 @@ router.post('/enroll-employee-training', (req, res) => {
             return res.status(500).json({ error: 'Internal Server Error' });
         }
         res.json({ success: true, message: 'Employee enrolled in training module successfully' });
+    });
+});
+
+
+router.get('/unenroll-modules/:selectedOption', (req, res) => {
+    const selectedOption = req.params.selectedOption;
+    
+    const qry = `
+        SELECT utm.user_id, utm.module_id, tm.module_name, utm.status
+        FROM user_training_modules utm
+        JOIN training_modules tm ON utm.module_id = tm.module_id
+        WHERE utm.user_id = ? AND utm.status = 'assigned';
+    `;
+    pool.query(qry, [selectedOption], (err, results) => {
+        if (err) {
+            console.error('Error fetching training modules:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json(results);
     });
 });
 
