@@ -31,6 +31,9 @@ function ManagerMetricsDashboard() {
 
   const [rarestBadge, setRarestBadge] = useState({ badge_name: '', count: 0 });
 
+  const [securitySuggestion, setSecuritySuggestion] = useState('');
+
+
 
 
   const refreshAllData = async () => {
@@ -168,6 +171,25 @@ function ManagerMetricsDashboard() {
   
     setChartData(tempChartData);
     // This effect should only run when trainingAssignments change.
+
+    const moduleCompletionCounts = {}; // {moduleId: count}
+
+    trainingAssignments.forEach(assignment => {
+      if (assignment.status === 'completed') {
+        moduleCompletionCounts[assignment.module_id] = (moduleCompletionCounts[assignment.module_id] || 0) + 1;
+      }
+    });
+  
+    const leastCompletedModuleId = Object.keys(moduleCompletionCounts).reduce((acc, moduleId) => {
+      return (!acc || moduleCompletionCounts[moduleId] < moduleCompletionCounts[acc]) ? moduleId : acc;
+    }, null);
+  
+    // Assuming you have a way to fetch or determine the security suggestion for a module
+    const securitySuggestion = getSecuritySuggestionForModule(leastCompletedModuleId);
+  
+    setSecuritySuggestion(securitySuggestion);
+
+
   }, [trainingAssignments]);
 
 
@@ -247,6 +269,28 @@ function ManagerMetricsDashboard() {
   };
 
 
+  function getSecuritySuggestionForModule(moduleId) {
+    // Example: Predefined suggestions
+    const suggestions = {
+      '1': 'Ensure all employees complete the phishing awareness training to significantly reduce the risk of successful email attacks.',
+      '2': 'Password security training is crucial for protecting against unauthorized access. Consider scheduling a session soon.',
+      '3': 'Intro Training to CyberGuardPro is greatly help with security understanding',
+      '4': 'General Cybersecurity could be lacking',
+      '5': 'Phishing attempts need to be educated against',
+      '6': 'It is beneficial for employees to be able to detect suspicious behavior',
+      '7': 'Strong passwords for important website is crucial'
+
+
+
+
+
+      // Add more module IDs and suggestions as needed
+    };
+  
+    return suggestions[moduleId] || 'No specific suggestion available. Ensure all security trainings are completed.';
+  }
+  
+
   
 
   return (
@@ -254,6 +298,11 @@ function ManagerMetricsDashboard() {
 
         <h2 style={{ borderBottom: '25px solid #17a2b8', paddingBottom: '10px' }}>Metrics Dashboard</h2>
   
+        <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
+          <h3>Security Suggestion Based on Training Completion:</h3>
+          <p>{securitySuggestion}</p>
+        </div>
+
 
         {/* Section for Employee Badges */}
         <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', color: '#343a40', marginTop: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
