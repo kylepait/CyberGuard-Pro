@@ -16,9 +16,10 @@ function TrainingModulesPage() {
 
   const [employees, setEmployees] = useState([]);
 
+  const [dropdownUnenrollEmployee, setDropdownUnenrollEmployee] = useState([]);
+  const [dropdownUnenrollModule, setDropdownUnenrollModule] = useState([]);
   const [selectedUnenrollEmployee, setSelectedUnenrollEmployee] = useState('');
   const [selectedUnenrollModule, setSelectedUnenrollModule] = useState('');
-  const [unenrollModules, setUnenrollModules] = useState([]);
   
   const [badges, setBadges] = useState([]);
   
@@ -115,6 +116,7 @@ function TrainingModulesPage() {
       fetchBadges();
       fetchEmployeeBadges();
 
+      fetchUnenrollEmployees();
 
     }, [user.user_id, user.user_role, user.organization_id]);
 
@@ -142,9 +144,34 @@ function TrainingModulesPage() {
     setCompletedModules(data.completedModules);
   };
 
+  const fetchUnenrollEmployees = async () => {
+    const response = await fetch(`http://localhost:4000/employees/organization/${user.organization_id}`);
+    const data = await response.json();
 
+    setDropdownUnenrollEmployee(data);
+    console.log(data);
+  };
+  
+  const handleUnenrollEmployeeChange = (event) => {
+    const selectedValue = event.target.value;
+    setSelectedUnenrollEmployee(selectedValue);
+    fetch(`/unenroll-modules/${selectedValue}`)
+      .then((response) => response.json())
+      .then((data) => {
+        const firstModule = data[0];
+        setSelectedUnenrollModule(data);
+        console.log(data);
 
+      });
 
+      console.log(selectedValue);
+  };
+
+  const handleUnenrollModuleChange = (event) => {
+    const selectedValue = event.target.value;
+    setSelectedUnenrollModule(selectedValue);
+  };
+  
 
   return (
     <div style={{ padding: '20px' }}>
@@ -289,20 +316,21 @@ function TrainingModulesPage() {
               Enroll Employee
             </button>
           </div>
+
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', maxWidth: '300px' }}>
             <h2>Unenroll Employees from Training</h2>
-            <select value={selectedUnenrollEmployee} onChange={(event) => setSelectedUnenrollEmployee(event.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+            <select value={selectedUnenrollEmployee} onChange={handleUnenrollEmployeeChange}
+            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
               <option value="">Select Employee</option>
-              {employees.map(employee => (
+              {employees.map((employee) => (
                 <option key={employee.user_id} value={employee.user_id}>{employee.first_name} {employee.last_name}</option>
               ))}
             </select>
-            <select value={selectedUnenrollModule} onChange={(event) => setSelectedUnenrollModule(event.target.value)} style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
-              <option value="">Select Training Module</option>
-              {trainingAssignments
-                .filter(assignment => assignment.status === 'assigned') // Filter out completed modules
-                .map(assignment => (
-                  <option key={assignment.module_id} value={assignment.module_id}>{assignment.module_name}</option>
+            <select value={selectedUnenrollModule} onChange={handleUnenrollModuleChange} 
+            style={{ padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}>
+            <option value="">Select Training Module</option>
+              {dropdownUnenrollModule.map((option) => (
+                  <option key={option.module_id} value={option.module_id}>{option.module_name}</option>
               ))}
             </select>
             <button onClick={unenrollEmployeeFromTraining} style={{ padding: '10px 20px', backgroundColor: '#dc3545', color: 'white', borderRadius: '5px', cursor: 'pointer', border: 'none' }}>
