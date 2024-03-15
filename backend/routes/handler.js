@@ -79,7 +79,7 @@ router.get('/badges', (req, res) => {
 });
 
 // Endpoint to get badges of all employees in a manager's organization
-router.get('/badges/organization/:organizationId', (req, res) => {
+router.get('/badges/organization/:organizationId', async (req, res) => {
     const organizationId = req.params.organizationId;
     
     const qry = `
@@ -90,11 +90,8 @@ router.get('/badges/organization/:organizationId', (req, res) => {
         WHERE users.organization_id = ? AND users.user_role != 'management';
     `;
     
-    pool.query(qry, [organizationId], (err, result) => {
-        if (err) {
-            console.error('Error executing query:', err);
-            return res.status(500).json({ error: 'Internal Server Error', details: err });
-        }
+    try {
+        const [result] = await pool.promise().query(qry, [organizationId]);
         
         // Process result to group badges by user and include earned_date
         const employees = result.reduce((acc, curr) => {
@@ -124,7 +121,10 @@ router.get('/badges/organization/:organizationId', (req, res) => {
         }, []);
         
         res.json(employees);
-    });
+    } catch (err) {
+        console.error('Error executing query:', err);
+        res.status(500).json({ error: 'Internal Server Error', details: err });
+    }
 });
 
 router.post('/Login', (req, res) => {

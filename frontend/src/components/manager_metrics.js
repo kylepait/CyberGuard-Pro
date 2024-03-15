@@ -26,9 +26,23 @@ function TrainingModulesPage() {
   const [badges, setBadges] = useState([]);
   
   const [loading, setLoading] = useState(true);
+
+
+  const refreshAllData = async () => {
+    await fetchTrainingAssignments();
+    await fetchEmployeeBadges();
+    await fetchAllTrainings();
+    await fetchTrainingAssignments();
+    await fetchBadges();
   
 
-  const enrollEmployeeInTraining = async () => {
+    await fetchEnrollEmployees();
+    await fetchUnenrollEmployees(); // Ensuring this calls the correct function to refresh employee badges
+    // Include any other fetch calls needed to refresh your UI accordingly
+  };
+  
+
+    const enrollEmployeeInTraining = async () => {
       const response = await fetch('http://localhost:4000/enroll-employee-training', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -37,9 +51,7 @@ function TrainingModulesPage() {
       const data = await response.json();
       if (data.success) {
           alert('Employee enrolled successfully!');
-          // Optionally: Refresh the list of enrolled trainings
-          fetchTrainingAssignments(); // Call this function to refresh assignments
-
+          await refreshAllData(); // Refresh all relevant data after a successful operation
       } else {
           alert('Failed to enroll employee.');
       }
@@ -55,12 +67,33 @@ function TrainingModulesPage() {
 
     if (data.success) {
       alert('Employee unenrolled successfully!');
-      // Optionally: Refresh the list of enrolled trainings
-      fetchTrainingAssignments(); // Call this function to refresh assignments
+      await refreshAllData(); // Refresh all relevant data after a successful operation
     } else {
       alert('Failed to unenroll employee.');
     }
-  
+  };
+
+  const fetchBadges = async () => {
+    try {
+      const response = await fetch(`http://localhost:4000/badges?user_id=${user.user_id}`);
+      const data = await response.json();
+      setBadges(data);
+    } catch (error) {
+      console.error('Error fetching badges:', error);
+    }
+  };
+
+  const fetchEmployeeBadges = async () => {
+    try {
+      const response = await fetch(`http://localhost:4000/badges/organization/${user.organization_id}`);
+      const data = await response.json();
+      console.log('Fetched employee badges data:', data);
+      setEmployees(data); // Assuming the endpoint returns structured data as discussed
+      setLoading(false); // Set loading to false after fetching data
+    } catch (error) {
+      console.error('Error fetching employee badges:', error);
+      setLoading(false); // Ensure loading is set to false even if there is an error
+    }
   };
 
 
@@ -68,8 +101,9 @@ function TrainingModulesPage() {
 
 
 
-
   useEffect(() => {
+
+      refreshAllData();
 
       fetchAllTrainings();
     
@@ -91,28 +125,7 @@ function TrainingModulesPage() {
 
 
 
-      const fetchBadges = async () => {
-        try {
-          const response = await fetch(`http://localhost:4000/badges?user_id=${user.user_id}`);
-          const data = await response.json();
-          setBadges(data);
-        } catch (error) {
-          console.error('Error fetching badges:', error);
-        }
-      };
-    
-      // New function to fetch badges of employees within the manager's organization
-      const fetchEmployeeBadges = async () => {
-        try {
-          const response = await fetch(`http://localhost:4000/badges/organization/${user.organization_id}`);
-          const data = await response.json();
-          setEmployees(data); // Assuming the endpoint returns structured data as discussed
-          setLoading(false); // Set loading to false after fetching data
-        } catch (error) {
-          console.error('Error fetching employee badges:', error);
-          setLoading(false); // Ensure loading is set to false even if there is an error
-        }
-      };
+
     
       // Call fetchBadges for all users
       fetchBadges();
