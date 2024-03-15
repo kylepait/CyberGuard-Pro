@@ -268,6 +268,8 @@ function ManagerMetricsDashboard() {
     setSelectedUnenrollModule(selectedValue);
   };
 
+  const [isAssignmentsVisible, setIsAssignmentsVisible] = useState(false);
+
 
   function getSecuritySuggestionForModule(moduleId) {
     // Example: Predefined suggestions
@@ -334,32 +336,37 @@ function ManagerMetricsDashboard() {
       
         <>
         <div style={{ marginTop: '40px', backgroundColor: '#f2f2f2', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-            <h2>Training Assignments for My Employees</h2>
-            <ul style={{ listStyleType: 'none', paddingLeft: '0', marginTop: '20px' }}>
-                {trainingAssignments.map((assignment) => (
-                <li key={`${assignment.user_id}-${assignment.module_name}`} style={{ 
-                    padding: '10px', 
-                    marginBottom: '10px',
-                    backgroundColor: '#ffffff',
-                    borderRadius: '5px',
-                    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    }}>
-                    <span style={{ fontWeight: 'bold' }}>{`${assignment.first_name} ${assignment.last_name}`}</span>  <span style={{ fontWeight: 'bold' }}>{assignment.module_name}</span>
-                    <span style={{ 
-                        padding: '5px 10px', 
-                        borderRadius: '5px', 
-                        color: '#ffffff', 
-                        backgroundColor: assignment.status === 'completed' ? '#28a745' : '#dc3545', // Green for Completed, Red for Assigned
-                    }}>
-                    {assignment.status}
-                    </span>
-                </li>
-                ))}
-            </ul>
-        </div>
+          <h2 onClick={() => setIsAssignmentsVisible(!isAssignmentsVisible)} style={{ cursor: 'pointer' }}>
+              Training Assignments for My Employees
+          </h2>
+          {isAssignmentsVisible && (
+              <ul style={{ listStyleType: 'none', paddingLeft: '0', marginTop: '20px' }}>
+                  {trainingAssignments.map((assignment) => (
+                      <li key={`${assignment.user_id}-${assignment.module_name}`} style={{ 
+                          padding: '10px', 
+                          marginBottom: '10px',
+                          backgroundColor: '#ffffff',
+                          borderRadius: '5px',
+                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                          display: 'flex',
+                          justifyContent: 'space-between',
+                          alignItems: 'center',
+                      }}>
+                          <span style={{ fontWeight: 'bold' }}>{`${assignment.first_name} ${assignment.last_name}`}</span>  
+                          <span style={{ fontWeight: 'bold' }}>{assignment.module_name}</span>
+                          <span style={{ 
+                              padding: '5px 10px', 
+                              borderRadius: '5px', 
+                              color: '#ffffff', 
+                              backgroundColor: assignment.status === 'completed' ? '#28a745' : '#dc3545',
+                          }}>
+                          {assignment.status}
+                          </span>
+                      </li>
+                  ))}
+              </ul>
+          )}
+      </div>
 
 
         <div style={{ marginTop: '20px' }}>
