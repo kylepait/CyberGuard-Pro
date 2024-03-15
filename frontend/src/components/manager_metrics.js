@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import MyChartComponent from './trainingModulesBarChart';
+
 
 function TrainingModulesPage() {
   const [assignedModules, setAssignedModules] = useState([]);
@@ -265,7 +267,7 @@ function TrainingModulesPage() {
         </div>
 
             
-
+        <MyChartComponent />
   
       
         <>
