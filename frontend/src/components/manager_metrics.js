@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import MyChartComponent from './trainingModulesBarChart';
 
 
-function TrainingModulesPage() {
+function ManagerMetricsDashboard() {
   const [assignedModules, setAssignedModules] = useState([]);
   const [completedModules, setCompletedModules] = useState([]);
 
@@ -45,6 +45,13 @@ function TrainingModulesPage() {
     await fetchUnenrollEmployees(); // Ensuring this calls the correct function to refresh employee badges
     // Include any other fetch calls needed to refresh your UI accordingly
   };
+
+    const [chartData, setChartData] = useState({
+      labels: [], // Employee names
+      assignedCount: [], // Number of assigned trainings per employee
+      completedCount: [], // Number of completed trainings per employee
+    });
+  
   
 
     const enrollEmployeeInTraining = async () => {
@@ -119,44 +126,49 @@ function TrainingModulesPage() {
   };
 
 
+  useEffect(() => {
+    const fetchDataIfNeeded = async () => {
+      
+      await refreshAllData();
+    };
+  
+    fetchDataIfNeeded();
+    // This effect should only run when the page loads or when certain user properties change that necessitate a re-fetch.
+  }, [user.user_id, user.user_role, user.organization_id]);
+
 
 
 
 
   useEffect(() => {
-
-      refreshAllData();
-
-      fetchAllTrainings();
-    
-      if (user.user_role === 'management') {
-        fetchTrainingAssignments();
+    const tempChartData = {
+      labels: [],
+      assignedCount: [],
+      completedCount: [],
+    };
+  
+    const assignmentsByEmployee = {}; // Structure to hold the count
+    trainingAssignments.forEach(assignment => {
+      if (!assignmentsByEmployee[assignment.user_id]) {
+        assignmentsByEmployee[assignment.user_id] = { assigned: 0, completed: 0 };
+        tempChartData.labels.push(`${assignment.first_name} ${assignment.last_name}`);
       }
-      fetchTrainingModules();
-
-      const fetchEmployees = async () => {
-        if (user.user_role === 'management') {
-          const url = `http://localhost:4000/employees/organization/${user.organization_id}`; // Updated URL to match the new endpoint
-          const response = await fetch(url);
-          const data = await response.json();
-          setEmployees(data);
-        }
-      };
-      
-      fetchEmployees();
-
-
-
-
-    
-      // Call fetchBadges for all users
-      fetchBadges();
-      fetchEmployeeBadges();
-
-      fetchEnrollEmployees();
-      fetchUnenrollEmployees();
-
-    }, [user.user_id, user.user_role, user.organization_id]);
+      if (assignment.status === 'completed') {
+        assignmentsByEmployee[assignment.user_id].completed++;
+      } else {
+        assignmentsByEmployee[assignment.user_id].assigned++;
+      }
+    });
+  
+    // Convert aggregated data into arrays for the chart
+    Object.values(assignmentsByEmployee).forEach(value => {
+      tempChartData.assignedCount.push(value.assigned);
+      tempChartData.completedCount.push(value.completed);
+    });
+  
+    setChartData(tempChartData);
+    // This effect should only run when trainingAssignments change.
+  }, [trainingAssignments]);
 
 
   // Declare fetchAllTrainings outside useEffect
@@ -267,7 +279,8 @@ function TrainingModulesPage() {
         </div>
 
             
-        <MyChartComponent />
+        <MyChartComponent chartData={chartData} />
+
   
       
         <>
@@ -416,4 +429,4 @@ function TrainingModulesPage() {
   );
 }
 
-export default TrainingModulesPage;
+export default ManagerMetricsDashboard;

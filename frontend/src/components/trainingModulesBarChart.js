@@ -5,35 +5,65 @@ import { Bar } from 'react-chartjs-2';
 // Import Chart.js to ensure it's registered
 import 'chart.js/auto';
 
-// Data and options for the chart
-const data = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
-  datasets: [
-    {
-      label: 'My First dataset',
-      backgroundColor: 'rgba(255,99,132,0.2)',
-      borderColor: 'rgba(255,99,132,1)',
-      borderWidth: 1,
-      hoverBackgroundColor: 'rgba(255,99,132,0.4)',
-      hoverBorderColor: 'rgba(255,99,132,1)',
-      data: [65, 59, 80, 81, 56, 55, 40]
-    }
-  ]
+const TrainingModulesBarChart = ({ chartData }) => {
+  // Prepare the data structure for Chart.js using the props
+  const data = {
+    labels: chartData.labels, // Use employee names as labels
+    datasets: [
+      {
+        label: 'Trainings Assigned',
+        backgroundColor: 'rgba(255,99,132,0.2)',
+        borderColor: 'rgba(255,99,132,1)',
+        borderWidth: 1,
+        hoverBackgroundColor: 'rgba(255,99,132,0.4)',
+        hoverBorderColor: 'rgba(255,99,132,1)',
+        data: chartData.assignedCount, // Use assigned training count
+      },
+      {
+        label: 'Trainings Completed',
+        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+        borderColor: 'rgba(54, 162, 235, 1)',
+        borderWidth: 1,
+        hoverBackgroundColor: 'rgba(54, 162, 235, 0.4)',
+        hoverBorderColor: 'rgba(54, 162, 235, 1)',
+        data: chartData.completedCount, // Use completed training count
+      }
+    ]
+  };
+
+  const options = {
+    maintainAspectRatio: false,
+    scales: {
+      y: {
+        beginAtZero: true,
+        title: {
+          display: true,
+          text: 'Number of Trainings'
+        }
+      },
+      x: {
+        title: {
+          display: true,
+          text: 'Employees'
+        }
+      }
+    },
+    plugins: {
+      legend: {
+        position: 'top',
+      },
+      title: {
+        display: true,
+        text: 'Employee Training Status'
+      },
+    },
+  };
+
+  return (
+    <div style={{ height: '300px', width: '100%' }}>
+      <Bar data={data} options={options} />
+    </div>
+  );
 };
 
-const options = {
-  maintainAspectRatio: false,
-  scales: {
-    y: {
-      beginAtZero: true
-    }
-  }
-};
-
-const MyChartComponent = () => (
-  <div style={{ height: '300px', width: '500px' }}>
-    <Bar data={data} options={options} />
-  </div>
-);
-
-export default MyChartComponent;
+export default TrainingModulesBarChart;
