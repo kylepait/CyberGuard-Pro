@@ -27,6 +27,9 @@ function TrainingModulesPage() {
   
   const [loading, setLoading] = useState(true);
 
+  const [rarestBadge, setRarestBadge] = useState({ badge_name: '', count: 0 });
+
+
 
   const refreshAllData = async () => {
     await fetchTrainingAssignments();
@@ -86,13 +89,30 @@ function TrainingModulesPage() {
   const fetchEmployeeBadges = async () => {
     try {
       const response = await fetch(`http://localhost:4000/badges/organization/${user.organization_id}`);
-      const data = await response.json();
-      console.log('Fetched employee badges data:', data);
-      setEmployees(data); // Assuming the endpoint returns structured data as discussed
-      setLoading(false); // Set loading to false after fetching data
+      if (response.ok) {
+        const data = await response.json();
+        setEmployees(data);
+  
+        // Initialize a map to count occurrences of each badge
+        let badgeCounts = new Map();
+  
+        // Iterate over each employee and their badges
+        data.forEach(employee => {
+          employee.badges.forEach(badge => {
+            let count = badgeCounts.get(badge.badge_id) || { count: 0, name: badge.badge_name };
+            badgeCounts.set(badge.badge_id, { count: count.count + 1, name: badge.badge_name });
+          });
+        });
+  
+        // Find the rarest badge by looking for the minimum count
+        let rarestBadge = Array.from(badgeCounts.values()).reduce((acc, val) => val.count < acc.count ? val : acc, { count: Infinity, name: '' });
+  
+        setRarestBadge({ badge_name: rarestBadge.name, count: rarestBadge.count });
+      } else {
+        console.error('Failed to fetch employee badges');
+      }
     } catch (error) {
       console.error('Error fetching employee badges:', error);
-      setLoading(false); // Ensure loading is set to false even if there is an error
     }
   };
 
@@ -278,6 +298,14 @@ function TrainingModulesPage() {
         </div>
 
 
+        <div style={{ marginTop: '20px' }}>
+          <h3>Rarest Badge:</h3>
+          {rarestBadge.count > 0 ? (
+            <p>The rarest badge is "{rarestBadge.badge_name}" with {rarestBadge.count} occurrences.</p>
+          ) : (
+            <p>Badge information is currently unavailable.</p>
+          )}
+        </div>
 
         <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', color: '#343a40', marginTop: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
             <h3>Employee Badge Information:</h3>
