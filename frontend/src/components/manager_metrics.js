@@ -152,7 +152,6 @@ function TrainingModulesPage() {
     const data = await response.json();
 
     setDropdownEnrollEmployee(data);
-    console.log(data);
   };
   
   
@@ -161,7 +160,6 @@ function TrainingModulesPage() {
     const data = await response.json();
 
     setDropdownUnenrollEmployee(data);
-    console.log(data);
   };
   
   const handleEnrollEmployeeChange = async (event) => {
@@ -171,8 +169,7 @@ function TrainingModulesPage() {
         const data = await response.json();
         setSelectedEnrollEmployee(selectedValue);
         setDropdownEnrollModule(data);
-        console.log(data);
-        console.log(selectedValue);
+
     } catch (error) {
         console.error('Error fetching enroll module data:', error);
     }
@@ -185,8 +182,6 @@ function TrainingModulesPage() {
         const data = await response.json();
         setSelectedUnenrollEmployee(selectedValue);
         setDropdownUnenrollModule(data);
-        console.log(data);
-        console.log(selectedValue);
     } catch (error) {
         console.error('Error fetching unenroll module data:', error);
     }
