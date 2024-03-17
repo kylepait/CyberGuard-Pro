@@ -11,6 +11,8 @@ function UserHome() {
   const [loading, setLoading] = useState(true);
   const [generatedPassword, setGeneratedPassword] = useState('');
 
+  const [latestGoal, setLatestGoal] = useState({});
+
 
   
 
@@ -147,6 +149,33 @@ function UserHome() {
       setLoading(false);
     }
   }, [user.user_id, user.user_role, user.organization_id]); // Added dependencies for useEffect
+
+
+  useEffect(() => {
+    const fetchLatestGoal = async () => {
+      try {
+        const organizationId = user.organization_id;
+        const response = await fetch(`http://localhost:4000/goals/latest/${organizationId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch the latest goal');
+        }
+        const data = await response.json();
+        console.log(data); // Confirm the structure of 'data'
+        setLatestGoal(data);
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    };
+  
+    fetchLatestGoal();
+  }, [user.organization_id]);
+  
+
+
+
+  
+
+
   
 
 
@@ -286,6 +315,21 @@ function UserHome() {
           </div>
         </div>
       )}
+
+    <div>
+      {latestGoal ? (
+        <div>
+          <h3>Latest Goal</h3>
+          <p>Incentive: {latestGoal.incentive || 'No incentive specified'}</p>
+          <p>Due Date: {latestGoal.due_date ? new Date(latestGoal.due_date).toLocaleDateString() : 'No due date'}</p>
+        </div>
+      ) : (
+        <p>Loading latest goal...</p>
+      )}
+    </div>
+
+
+      
     </div>
   );
 }

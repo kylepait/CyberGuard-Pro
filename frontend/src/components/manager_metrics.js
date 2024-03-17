@@ -33,6 +33,11 @@ function ManagerMetricsDashboard() {
 
   const [securitySuggestion, setSecuritySuggestion] = useState('');
 
+  const [goalDueDate, setGoalDueDate] = useState('');
+  const [goalIncentive, setGoalIncentive] = useState('');
+  const [topBadgeEarners, setTopBadgeEarners] = useState([]);
+
+
 
 
 
@@ -192,6 +197,13 @@ function ManagerMetricsDashboard() {
 
   }, [trainingAssignments]);
 
+  useEffect(() => {
+      // Assume `employees` is already populated with badge counts
+      const maxBadgeCount = Math.max(...employees.map(emp => emp.badges.length));
+      const earners = employees.filter(emp => emp.badges.length === maxBadgeCount);
+      setTopBadgeEarners(earners);
+  }, [employees]);
+
 
   // Declare fetchAllTrainings outside useEffect
   const fetchAllTrainings = async () => {
@@ -254,6 +266,42 @@ function ManagerMetricsDashboard() {
     } catch (error) {
         console.error('Error fetching unenroll module data:', error);
     }
+  };
+
+  const handleSetGoal = async (event) => {
+      event.preventDefault();
+
+      // Assuming you have the organization ID stored in the state or derived from the user's session
+      const organizationId = user.organization_id;
+
+      const goalData = {
+          organizationId,
+          dueDate: goalDueDate,
+          incentive: goalIncentive
+      };
+
+      try {
+          // Replace the URL with your actual endpoint
+          const response = await fetch('http://localhost:4000/api/goals', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify(goalData),
+          });
+
+          const responseData = await response.json();
+
+          if (response.ok) {
+              alert('Goal set successfully');
+              // Optionally, clear the form fields or update the UI
+          } else {
+              alert('Failed to set goal');
+          }
+      } catch (error) {
+          console.error('Error setting goal:', error);
+          alert('Error setting goal');
+      }
   };
 
   const handleEnrollModuleChange = async (event) => {
@@ -476,6 +524,51 @@ function ManagerMetricsDashboard() {
               Unenroll Employee
             </button>
           </div>
+
+          <div style={{ marginTop: '20px', padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
+            <h3>Set a Goal for Your Employees</h3>
+            <form onSubmit={handleSetGoal}>
+                <div>
+                    <label htmlFor="goalDueDate">Goal Due Date:</label>
+                    <input 
+                        type="date" 
+                        id="goalDueDate" 
+                        value={goalDueDate} 
+                        onChange={e => setGoalDueDate(e.target.value)} 
+                        style={{ marginLeft: '10px' }}
+                    />
+                </div>
+                <div style={{ marginTop: '10px' }}>
+                    <label htmlFor="goalIncentive">Incentive:</label>
+                    <textarea
+                        id="goalIncentive"
+                        value={goalIncentive}
+                        onChange={e => setGoalIncentive(e.target.value)}
+                        placeholder="Enter incentive"
+                        style={{ marginLeft: '10px', width: '100%', height: '100px', resize: 'vertical' }} // Adjusted for better usability
+                    ></textarea>
+                    <div style={{ fontSize: '12px', marginTop: '5px' }}>Maximum of 255 characters.</div>
+                </div>
+                <button type="submit" style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
+                    Set Goal
+                </button>
+            </form>
+        </div>
+
+        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div> {/* Set Goal form goes here */} </div>
+            <div style={{ marginTop: '20px', padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '5px', marginLeft: '20px' }}>
+                <h3>Top Badge Earners</h3>
+                <ul>
+                    {topBadgeEarners.map(earner => (
+                        <li key={earner.user_id}>
+                            {earner.first_name} {earner.last_name} - {earner.badges.length} Badges
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </div>
+
         </div>
 
         </>

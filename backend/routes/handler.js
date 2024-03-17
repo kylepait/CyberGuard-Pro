@@ -424,5 +424,43 @@ router.get('/employees/organization/:organizationId', (req, res) => {
     });
 });
 
+router.post('/api/goals', (req, res) => {
+    const { organizationId, dueDate, incentive } = req.body;
+    
+    // Assuming your `pool` variable is properly set up for database operations
+    const query = `INSERT INTO goals (organization_id, due_date, incentive) VALUES (?, ?, ?)`;
+    pool.query(query, [organizationId, dueDate, incentive], (error, results) => {
+        if (error) {
+            console.error('Failed to set goal:', error);
+            res.status(500).json({ success: false, message: 'Failed to set goal' });
+        } else {
+            res.json({ success: true, message: 'Goal set successfully' });
+        }
+    });
+});
+
+router.get('/goals/latest/:organizationId', async (req, res) => {
+    const organizationId = req.params.organizationId;
+
+    const query = `
+        SELECT * FROM goals 
+        WHERE organization_id = ? 
+        ORDER BY due_date DESC 
+        LIMIT 1;
+    `;
+
+    try {
+        const [result] = await pool.promise().query(query, [organizationId]);
+        if (result.length > 0) {
+            res.json(result[0]);
+        } else {
+            res.status(404).json({ message: "No goals found for this organization." });
+        }
+    } catch (error) {
+        console.error('Failed to fetch latest goal:', error);
+        res.status(500).json({ message: 'Failed to fetch latest goal', error });
+    }
+});
+
 
 module.exports = router;
