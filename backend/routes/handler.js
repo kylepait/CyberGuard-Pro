@@ -342,10 +342,6 @@ router.post('/enroll-training', (req, res) => {
 
 router.post('/enroll-employee-training', (req, res) => {
     const { employeeUserId, moduleId } = req.body;
-    const managerId = req.managerId; // Determine managerId based on session or token
-
-    // Optional: Check if the employee belongs to the manager's organization
-    // and if the moduleId is valid, then proceed with enrollment
 
     const qry = 'INSERT INTO user_training_modules (user_id, module_id, status) VALUES (?, ?, "assigned") ON DUPLICATE KEY UPDATE status = "assigned"';
     pool.query(qry, [employeeUserId, moduleId], (err, results) => {
@@ -399,10 +395,6 @@ router.get('/unenroll-modules/:selectedOption', (req, res) => {
 
 router.delete('/unenroll-employee-training', (req, res) => {
     const { employeeUserId, moduleId } = req.body;
-    const managerId = req.managerId; // Determine managerId based on session or token
-
-    // Optional: Check if the employee belongs to the manager's organization
-    // and if the moduleId is valid, then proceed with unenrollment
 
     const qry = 'DELETE FROM user_training_modules WHERE user_id = ? AND module_id = ? AND status = "assigned"';
     pool.query(qry, [employeeUserId, moduleId], (err, results) => {
@@ -497,6 +489,64 @@ router.get('/leaderboard/:organizationId', (req, res) => {
         res.json(leaderboard);
         }
     });
+});
+
+router.post('/start-training', async (req, res) => {
+    const { userId, moduleId } = req.body;
+    const startTime = new Date();
+
+    const updateDuration =  `
+        UPDATE user_training_modules
+        SET duration = ?
+        WHERE user_id = ? AND module_id = ?;
+    `;
+
+    pool.query(updateDuration, [startTime, userId, moduleId], (err, result) => {
+        if(err) {
+            console.error('Error starting training module:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json({ success: true, message: 'Training module started successfully' });
+    });
+});
+
+router.get('/startModule/:', (req, res) => {
+
+});
+
+router.post('/end-training', async (req, res) => {
+    const { userId, moduleId } = req.body;
+    const endTime = new Date();
+
+    const qry = 'SELECT duration FROM user_training_modules WHERE user_id = ? AND module_id = ?';
+    pool.query(qry, [userId, moduleId], (err, result) => {
+        if (err) {
+            console.error('Error ending training module:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        if (result.length === 0) {
+            return res.status(404).json({ error: 'Training module not found' });
+        }
+
+        const startTime = result[0].duration;
+        const durationSecs = Math.floor((endTime - startTime) / 1000); // Duration in seconds
+
+        const updateDuration =  `
+            UPDATE user_training_modules
+            SET duration = ?
+            WHERE user_id = ? AND module_id = ?;
+        `;
+
+        pool.query(updateDuration, [durationSecs, userId, moduleId], (err, res) => {
+            if(err) {
+                console.error('Error ending training module:', err);
+                return res.status(500).json({ error: 'Internal Server Error' });
+            }
+            res.json({ success: true, message: 'Training module ended successfully' });
+        });
+    });
+    
 });
 
 

@@ -9,6 +9,7 @@ import DevHub from './components/dev_hub';
 import TriviaGame from './components/triviaGame';
 import QuizPopup from './components/QuizPopup';
 import BarChart from './components/trainingModulesBarChart';
+import StartModule from './components/StartModule';
 
 
 import Nav from './components/Nav';
@@ -30,6 +31,7 @@ function App() {
             <Route path="/triviaGame" element={<TriviaGame/>} />
             <Route path="/QuizPopup" element={<QuizPopup/>}/>
             <Route path="/trainingModulesBarChart" element={<BarChart/>}/>
+            <Route path="/StartModule" element={<StartModule/>}/>
 
 
           </Routes>

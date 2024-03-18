@@ -19,6 +19,8 @@ function TrainingModulesPage() {
 
   const [employees, setEmployees] = useState([]);
 
+  const navigate = useNavigate();
+
   const enrollEmployeeInTraining = async () => {
       const response = await fetch('http://localhost:4000/enroll-employee-training', {
           method: 'POST',
@@ -98,6 +100,29 @@ function TrainingModulesPage() {
     setCompletedModules(data.completedModules);
   };
 
+  const startTraining = async (moduleId) => {
+    try {
+      const response = await fetch('http://localhost:4000/start-training', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId: user.user_id, moduleId }),
+      });
+
+      const data = await response.json();
+      if(data.success) {
+        alert('Training module started successfully!');
+        navigate('/StartModule');
+      } else {
+        alert('Failed to start training module.');
+      }
+    } catch (error) {
+      console.error('Error starting training:', error);
+      alert('Error starting training');
+    }
+  };
+
   const completeTraining = async (moduleId) => {
     try {
       const response = await fetch('http://localhost:4000/complete-training', {
@@ -148,6 +173,10 @@ function TrainingModulesPage() {
         {assignedModules.map(module => (
           <div key={module.module_id} style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', padding: '20px', borderRadius: '10px', height: '550px' }}>
             <h3>{module.module_name}</h3>
+            <button 
+                  onClick={() => startTraining(module.module_id)}> 
+                  Start Training
+            </button>
             <iframe src={module.module_link} width="100%" height="400" title={module.module_type} style={{ border: 'none', marginBottom: '10px' }}></iframe>
             {module.module_format === 'slides' && (
             <>
