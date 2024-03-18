@@ -234,15 +234,7 @@ function ManagerMetricsDashboard() {
 
     setDropdownEnrollEmployee(data);
   };
-  
-  
-  const fetchUnenrollEmployees = async () => {
-    const response = await fetch(`http://localhost:4000/employees/organization/${user.organization_id}`);
-    const data = await response.json();
 
-    setDropdownUnenrollEmployee(data);
-  };
-  
   const handleEnrollEmployeeChange = async (event) => {
     const selectedValue = event.target.value;
     try {
@@ -254,6 +246,19 @@ function ManagerMetricsDashboard() {
     } catch (error) {
         console.error('Error fetching enroll module data:', error);
     }
+  };
+
+  const handleEnrollModuleChange = async (event) => {
+    const selectedValue = event.target.value;
+    
+    setSelectedEnrollModule(selectedValue);
+  };
+  
+  const fetchUnenrollEmployees = async () => {
+    const response = await fetch(`http://localhost:4000/employees/organization/${user.organization_id}`);
+    const data = await response.json();
+
+    setDropdownUnenrollEmployee(data);
   };
   
   const handleUnenrollEmployeeChange = async (event) => {
@@ -302,12 +307,6 @@ function ManagerMetricsDashboard() {
           console.error('Error setting goal:', error);
           alert('Error setting goal');
       }
-  };
-
-  const handleEnrollModuleChange = async (event) => {
-    const selectedValue = event.target.value;
-    
-    setSelectedEnrollModule(selectedValue);
   };
 
   const handleUnenrollModuleChange = async (event) => {
@@ -473,7 +472,6 @@ function ManagerMetricsDashboard() {
                 <span style={{ fontWeight: 'bold' }}>{index + 1}</span>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginLeft: '10px' }}>
                   <p style={{ fontWeight: 'bold', margin: '0' }}>{employee.first_name} {employee.last_name}</p>
-                  <p style={{ margin: '0', fontSize: '12px' }}>User ID: {employee.user_id}</p>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                   <p style={{ margin: '0' }}>Score: {Array.isArray(employee.badges) ? employee.badges.length : 0}</p>
