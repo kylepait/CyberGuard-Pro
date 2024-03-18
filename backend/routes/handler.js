@@ -491,7 +491,7 @@ router.get('/leaderboard/:organizationId', (req, res) => {
             // Calculate leaderboard ranks dynamically
             const leaderboard = result.map((user, index) => ({
               ...user,
-              rank: index + 1,
+              rank: index,
             }));
 
         res.json(leaderboard);
