@@ -315,7 +315,7 @@ function UserHome() {
 
       {user.user_role === 'management' && (
         <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', color: '#343a40', marginTop: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-          <h3 style={{ color: '#17a2b8' }}>Employees in Your Organization:</h3>
+          <h3 style={{ color: '#007bff' }}>EMPLOYEES IN YOUR ORGANIZATION:</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '15px' }}>
             {employees.map(employee => (
               <div key={employee.user_id} style={{ background: 'white', borderRadius: '5px', padding: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
@@ -338,7 +338,7 @@ function UserHome() {
   <div style={{ margin: '20px 0', padding: '20px', backgroundColor: '#f7f7f7', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
     {latestGoal ? (
       <div>
-        <h3 style={{ color: '#007bff' }}>Latest Organization Incentive</h3>
+        <h3 style={{ color: '#007bff' }}>LATEST ORGANIZATION INCENTIVE</h3>
         <p style={{ fontSize: '16px', margin: '10px 0' }}>
           <strong>Incentive:</strong> {latestGoal.incentive || 'No incentive specified'}
         </p>

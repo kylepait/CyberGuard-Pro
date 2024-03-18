@@ -110,21 +110,22 @@ function ManagerMetricsDashboard() {
         const data = await response.json();
         setEmployees(data);
   
-        // Initialize a map to count occurrences of each badge
+        // Initialize a map to count occurrences of each badge and keep track of an image path
         let badgeCounts = new Map();
   
         // Iterate over each employee and their badges
         data.forEach(employee => {
           employee.badges.forEach(badge => {
-            let count = badgeCounts.get(badge.badge_id) || { count: 0, name: badge.badge_name };
-            badgeCounts.set(badge.badge_id, { count: count.count + 1, name: badge.badge_name });
+            // If the badge is already in the map, increment its count, otherwise, set its count to 1 and save its image path
+            let badgeInfo = badgeCounts.get(badge.badge_id) || { count: 0, name: badge.badge_name, imagePath: badge.image_path };
+            badgeCounts.set(badge.badge_id, { ...badgeInfo, count: badgeInfo.count + 1 });
           });
         });
   
         // Find the rarest badge by looking for the minimum count
-        let rarestBadge = Array.from(badgeCounts.values()).reduce((acc, val) => val.count < acc.count ? val : acc, { count: Infinity, name: '' });
+        let rarestBadge = Array.from(badgeCounts.values()).reduce((acc, val) => val.count < acc.count ? val : acc, { count: Infinity, name: '', imagePath: '' });
   
-        setRarestBadge({ badge_name: rarestBadge.name, count: rarestBadge.count });
+        setRarestBadge({ badge_name: rarestBadge.name, count: rarestBadge.count, image_path: rarestBadge.imagePath });
       } else {
         console.error('Failed to fetch employee badges');
       }
@@ -132,6 +133,7 @@ function ManagerMetricsDashboard() {
       console.error('Error fetching employee badges:', error);
     }
   };
+  
 
 
   useEffect(() => {
@@ -316,6 +318,8 @@ function ManagerMetricsDashboard() {
   };
 
   const [isAssignmentsVisible, setIsAssignmentsVisible] = useState(false);
+  const [employeeVisibility, setEmployeeVisibility] = useState({});
+
 
 
   function getSecuritySuggestionForModule(moduleId) {
@@ -383,13 +387,25 @@ function ManagerMetricsDashboard() {
       
         <>
         <div style={{ marginTop: '40px', backgroundColor: '#f2f2f2', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-          <h2 onClick={() => setIsAssignmentsVisible(!isAssignmentsVisible)} style={{ cursor: 'pointer' }}>
+          <h2 style={{ cursor: 'pointer' }}>
               Training Assignments for My Employees
           </h2>
-          {isAssignmentsVisible && (
-              <ul style={{ listStyleType: 'none', paddingLeft: '0', marginTop: '20px' }}>
-                  {trainingAssignments.map((assignment) => (
-                      <li key={`${assignment.user_id}-${assignment.module_name}`} style={{ 
+          {trainingAssignments.reduce((acc, assignment) => {
+            // Create an array of unique employee IDs
+            if (!acc.includes(assignment.user_id)) acc.push(assignment.user_id);
+            return acc;
+          }, []).map((userId) => {
+            // Filter assignments for this employee
+            const employeeAssignments = trainingAssignments.filter(assignment => assignment.user_id === userId);
+            return (
+              <div key={userId}>
+                <h3 onClick={() => setEmployeeVisibility(prev => ({ ...prev, [userId]: !prev[userId] }))} style={{ cursor: 'pointer', textAlign: 'left' }}>
+                  {employeeAssignments[0].first_name} {employeeAssignments[0].last_name} {/* Assuming first_name and last_name are available */}
+                </h3>
+                {employeeVisibility[userId] && (
+                  <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
+                    {employeeAssignments.map((assignment) => (
+                      <li key={`${assignment.module_name}`} style={{ 
                           padding: '10px', 
                           marginBottom: '10px',
                           backgroundColor: '#ffffff',
@@ -399,7 +415,6 @@ function ManagerMetricsDashboard() {
                           justifyContent: 'space-between',
                           alignItems: 'center',
                       }}>
-                          <span style={{ fontWeight: 'bold' }}>{`${assignment.first_name} ${assignment.last_name}`}</span>  
                           <span style={{ fontWeight: 'bold' }}>{assignment.module_name}</span>
                           <span style={{ 
                               padding: '5px 10px', 
@@ -410,20 +425,47 @@ function ManagerMetricsDashboard() {
                           {assignment.status}
                           </span>
                       </li>
-                  ))}
-              </ul>
-          )}
-      </div>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
 
-        <div style={{ marginTop: '20px' }}>
-          <h3>Rarest Badge:</h3>
+
+
+      <div style={{
+        marginTop: '20px',
+        padding: '20px',
+        backgroundColor: '#fff',
+        borderRadius: '8px',
+        boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between'
+      }}>
+        <div>
+          <h3 style={{ marginBottom: '10px', color: '#007bff' }}>Rarest Badge</h3>
           {rarestBadge.count > 0 ? (
-            <p>The rarest badge is "{rarestBadge.badge_name}" with {rarestBadge.count} occurrences.</p>
+            <p style={{ margin: 0 }}>
+              The rarest badge is "<strong>{rarestBadge.badge_name}</strong>" with <strong>{rarestBadge.count}</strong> occurrences.
+            </p>
           ) : (
-            <p>Badge information is currently unavailable.</p>
+            <p style={{ margin: 0 }}>Badge information is currently unavailable.</p>
           )}
         </div>
+        {rarestBadge.count > 0 && rarestBadge.image_path ? (
+          <img src={rarestBadge.image_path.startsWith('/') ? process.env.PUBLIC_URL + rarestBadge.image_path : rarestBadge.image_path} alt={rarestBadge.badge_name} style={{ width: '100px', height: '100px', borderRadius: '50%' }} />
+        ) : (
+          <div style={{ width: '50px', height: '50px', background: '#ddd', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {/* Placeholder if no image path is available */}
+            <span style={{ textAlign: 'center', color: '#666' }}>?</span>
+          </div>
+        )}
+      </div>
+
 
         <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', color: '#343a40', marginTop: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
             <h3>Employee Badge Information:</h3>
@@ -525,47 +567,69 @@ function ManagerMetricsDashboard() {
 
 
 
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div style={{ marginTop: '20px', padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
-                <h3>Set a Goal for Your Employees</h3>
-                <form onSubmit={handleSetGoal}>
-                    <div>
-                        <label htmlFor="goalDueDate">Goal Due Date:</label>
-                        <input 
-                            type="date" 
-                            id="goalDueDate" 
-                            value={goalDueDate} 
-                            onChange={e => setGoalDueDate(e.target.value)} 
-                            style={{ marginLeft: '10px' }}
-                        />
-                    </div>
-                    <div style={{ marginTop: '10px' }}>
-                        <label htmlFor="goalIncentive">Incentive:</label>
-                        <textarea
-                            id="goalIncentive"
-                            value={goalIncentive}
-                            onChange={e => setGoalIncentive(e.target.value)}
-                            placeholder="Enter incentive"
-                            style={{ marginLeft: '10px', width: '100%', height: '100px', resize: 'vertical' }} // Adjusted for better usability
-                        ></textarea>
-                        <div style={{ fontSize: '12px', marginTop: '5px' }}>Maximum of 255 characters.</div>
-                    </div>
-                    <button type="submit" style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
-                        Set Goal
-                    </button>
-                </form>
+          <div style={{ display: 'flex', justifyContent: 'space-between', gap: '20px', marginTop: '20px' }}>
+            {/* Set a Goal for Your Employees */}
+            <div style={{
+              flex: 1,
+              padding: '20px',
+              backgroundColor: '#f0f0f0',
+              borderRadius: '8px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}>
+              <h3 style={{ marginBottom: '20px' }}>Set a Goal for Your Employees</h3>
+              <form onSubmit={handleSetGoal}>
+                <div style={{ marginBottom: '15px' }}>
+                  <label htmlFor="goalDueDate" style={{ marginRight: '10px' }}>Goal Due Date:</label>
+                  <input 
+                    type="date" 
+                    id="goalDueDate" 
+                    value={goalDueDate} 
+                    onChange={e => setGoalDueDate(e.target.value)} 
+                  />
+                </div>
+                <div style={{ marginBottom: '15px' }}>
+                  <label htmlFor="goalIncentive" style={{ marginRight: '10px' }}>Incentive:</label>
+                  <textarea
+                    id="goalIncentive"
+                    value={goalIncentive}
+                    onChange={e => setGoalIncentive(e.target.value)}
+                    placeholder="Enter incentive"
+                    style={{ width: '100%', height: '100px', resize: 'vertical', padding: '10px', borderRadius: '5px', border: '1px solid #ccc' }}
+                  />
+                  <div style={{ fontSize: '12px', marginTop: '5px' }}>Maximum of 255 characters.</div>
+                </div>
+                <button type="submit" style={{
+                  padding: '10px 20px',
+                  backgroundColor: '#007bff',
+                  color: 'white',
+                  borderRadius: '5px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'opacity 0.3s'
+                }}>
+                  Set Goal
+                </button>
+              </form>
             </div>
-            <div style={{ marginTop: '20px', padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '5px', marginLeft: '20px' }}>
-                <h3>Top Badge Earners</h3>
-                <ul>
-                    {topBadgeEarners.map(earner => (
-                        <li key={earner.user_id}>
-                            {earner.first_name} {earner.last_name} - {earner.badges.length} Badges
-                        </li>
-                    ))}
-                </ul>
+
+            {/* Current Incentive Winner(s) */}
+            <div style={{
+              flex: 1,
+              padding: '20px',
+              backgroundColor: '#f0f0f0',
+              borderRadius: '8px',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
+            }}>
+              <h3 style={{ marginBottom: '20px' }}>Current Incentive Winner(s)</h3>
+              <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
+                {topBadgeEarners.map(earner => (
+                  <li key={earner.user_id} style={{ marginBottom: '10px' }}>
+                    <strong>{earner.first_name} {earner.last_name}</strong> - {earner.badges.length} Badges
+                  </li>
+                ))}
+              </ul>
             </div>
-        </div>
+          </div>
 
         </div>
 
