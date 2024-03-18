@@ -218,22 +218,21 @@ function UserHome() {
         </Link>
     )}
 
-    <div style={{ display: 'flex', marginBottom: '20px', gap: '20px' }}>
-      <div style={{ 
-          flex: 1, 
-          backgroundColor: '#ffffff', 
-          padding: '20px', 
-          borderRadius: '5px', 
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px' }}>
+      <div style={{ display: 'flex', marginBottom: '20px', gap: '20px' }}>
+        <div style={{
+            flex: 1,
+            backgroundColor: '#f8f9fa', // Lighter background for subtle contrast
+            padding: '20px',
+            borderRadius: '8px', // Slightly larger radius for softer edges
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)', // Enhanced shadow for depth
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '15px', // Increased gap for better spacing
+          }}>
           
-          <h2 style={{ margin: '0 0 10px 0', paddingBottom: '5px' }}>
-              Welcome, {user.username}!
-          </h2>
+          <h2 style={{ margin: '0 0 15px 0', paddingBottom: '10px', borderBottom: '2px solid #007bff' }}>Welcome, {user.first_name}!</h2>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', columnGap: '20px', rowGap: '5px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', columnGap: '20px', rowGap: '10px', padding: '10px', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
               <strong>Email:</strong>
               <span>{user.email}</span>
               <strong>User ID:</strong>
@@ -249,18 +248,15 @@ function UserHome() {
               <strong>Score:</strong>
               <span>{user.score}</span>
               {user.user_role !== 'management' && (
-                <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', columnGap: '20px' }}>
+                <React.Fragment>
                   <strong>Leaderboard Rank: </strong> 
-                  {leaderboard.map(employee => {
-                    if(employee.user_id === user.user_id) {
-                      return <span key={employee.user_id}> {employee.rank}</span>;
-                    }
-                    return null;
-                  })}
-                </div>
+                  <span>
+                    {leaderboard.filter(employee => employee.user_id === user.user_id).map(employee => <span key={employee.user_id}>{employee.rank}</span>)}
+                  </span>
+                </React.Fragment>
               )}
-              </div>
           </div>
+        </div>
 
       <div style={{ flex: 1, backgroundColor: '#ffffff', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
           <h3>Your Badges:</h3>
@@ -339,24 +335,24 @@ function UserHome() {
         </div>
       )}
 
-    <div style={{ margin: '20px 0', padding: '20px', backgroundColor: '#f7f7f7', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
-      {latestGoal ? (
-        <div>
-          <h3 style={{ color: '#007bff' }}>Latest Organization Incentive</h3>
-          <p style={{ fontSize: '16px', margin: '10px 0' }}>
-            <strong>Incentive:</strong> {latestGoal.incentive || 'No incentive specified'}
-          </p>
-          <p style={{ fontSize: '16px', margin: '10px 0' }}>
-            <strong>Due Date:</strong> {latestGoal.due_date ? new Date(latestGoal.due_date).toLocaleDateString() : 'No due date'}
-          </p>
-          <p style={{ marginTop: '20px', fontSize: '16px', backgroundColor: '#dff0d8', padding: '10px', borderRadius: '5px', color: '#3c763d' }}>
-            Be number 1 on the leaderboard by the posted due date to earn your cybersecurity incentive award.
-          </p>
-        </div>
-      ) : (
-        <p style={{ fontSize: '16px', textAlign: 'center', color: '#888' }}>Loading latest goal...</p>
-      )}
-    </div>
+  <div style={{ margin: '20px 0', padding: '20px', backgroundColor: '#f7f7f7', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+    {latestGoal ? (
+      <div>
+        <h3 style={{ color: '#007bff' }}>Latest Organization Incentive</h3>
+        <p style={{ fontSize: '16px', margin: '10px 0' }}>
+          <strong>Incentive:</strong> {latestGoal.incentive || 'No incentive specified'}
+        </p>
+        <p style={{ fontSize: '16px', margin: '10px 0' }}>
+          <strong>Due Date:</strong> {latestGoal.due_date ? new Date(latestGoal.due_date).toLocaleDateString() : 'No due date'}
+        </p>
+        <p style={{ marginTop: '20px', fontSize: '16px', backgroundColor: '#dff0d8', padding: '10px', borderRadius: '5px', color: '#3c763d' }}>
+          Be number 1 on the leaderboard by the posted due date to earn your cybersecurity incentive award.
+        </p>
+      </div>
+    ) : (
+      <p style={{ fontSize: '16px', textAlign: 'center', color: '#888' }}>Loading latest goal...</p>
+    )}
+  </div>
 
 
 
