@@ -339,17 +339,26 @@ function UserHome() {
         </div>
       )}
 
-    <div>
+    <div style={{ margin: '20px 0', padding: '20px', backgroundColor: '#f7f7f7', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
       {latestGoal ? (
         <div>
-          <h3>Latest Goal</h3>
-          <p>Incentive: {latestGoal.incentive || 'No incentive specified'}</p>
-          <p>Due Date: {latestGoal.due_date ? new Date(latestGoal.due_date).toLocaleDateString() : 'No due date'}</p>
+          <h3 style={{ color: '#007bff' }}>Latest Organization Incentive</h3>
+          <p style={{ fontSize: '16px', margin: '10px 0' }}>
+            <strong>Incentive:</strong> {latestGoal.incentive || 'No incentive specified'}
+          </p>
+          <p style={{ fontSize: '16px', margin: '10px 0' }}>
+            <strong>Due Date:</strong> {latestGoal.due_date ? new Date(latestGoal.due_date).toLocaleDateString() : 'No due date'}
+          </p>
+          <p style={{ marginTop: '20px', fontSize: '16px', backgroundColor: '#dff0d8', padding: '10px', borderRadius: '5px', color: '#3c763d' }}>
+            Be number 1 on the leaderboard by the posted due date to earn your cybersecurity incentive award.
+          </p>
         </div>
       ) : (
-        <p>Loading latest goal...</p>
+        <p style={{ fontSize: '16px', textAlign: 'center', color: '#888' }}>Loading latest goal...</p>
       )}
     </div>
+
+
 
 
       

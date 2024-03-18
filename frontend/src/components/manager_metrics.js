@@ -523,38 +523,38 @@ function ManagerMetricsDashboard() {
             </button>
           </div>
 
-          <div style={{ marginTop: '20px', padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
-            <h3>Set a Goal for Your Employees</h3>
-            <form onSubmit={handleSetGoal}>
-                <div>
-                    <label htmlFor="goalDueDate">Goal Due Date:</label>
-                    <input 
-                        type="date" 
-                        id="goalDueDate" 
-                        value={goalDueDate} 
-                        onChange={e => setGoalDueDate(e.target.value)} 
-                        style={{ marginLeft: '10px' }}
-                    />
-                </div>
-                <div style={{ marginTop: '10px' }}>
-                    <label htmlFor="goalIncentive">Incentive:</label>
-                    <textarea
-                        id="goalIncentive"
-                        value={goalIncentive}
-                        onChange={e => setGoalIncentive(e.target.value)}
-                        placeholder="Enter incentive"
-                        style={{ marginLeft: '10px', width: '100%', height: '100px', resize: 'vertical' }} // Adjusted for better usability
-                    ></textarea>
-                    <div style={{ fontSize: '12px', marginTop: '5px' }}>Maximum of 255 characters.</div>
-                </div>
-                <button type="submit" style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
-                    Set Goal
-                </button>
-            </form>
-        </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <div> {/* Set Goal form goes here */} </div>
+
+          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div style={{ marginTop: '20px', padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
+                <h3>Set a Goal for Your Employees</h3>
+                <form onSubmit={handleSetGoal}>
+                    <div>
+                        <label htmlFor="goalDueDate">Goal Due Date:</label>
+                        <input 
+                            type="date" 
+                            id="goalDueDate" 
+                            value={goalDueDate} 
+                            onChange={e => setGoalDueDate(e.target.value)} 
+                            style={{ marginLeft: '10px' }}
+                        />
+                    </div>
+                    <div style={{ marginTop: '10px' }}>
+                        <label htmlFor="goalIncentive">Incentive:</label>
+                        <textarea
+                            id="goalIncentive"
+                            value={goalIncentive}
+                            onChange={e => setGoalIncentive(e.target.value)}
+                            placeholder="Enter incentive"
+                            style={{ marginLeft: '10px', width: '100%', height: '100px', resize: 'vertical' }} // Adjusted for better usability
+                        ></textarea>
+                        <div style={{ fontSize: '12px', marginTop: '5px' }}>Maximum of 255 characters.</div>
+                    </div>
+                    <button type="submit" style={{ marginTop: '20px', padding: '10px 20px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
+                        Set Goal
+                    </button>
+                </form>
+            </div>
             <div style={{ marginTop: '20px', padding: '20px', backgroundColor: '#f0f0f0', borderRadius: '5px', marginLeft: '20px' }}>
                 <h3>Top Badge Earners</h3>
                 <ul>
