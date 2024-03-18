@@ -182,6 +182,18 @@ router.post('/add-badge', (req, res) => {
         }
         res.json({ success: true, message: 'Badge added to user successfully' });
     });
+
+    // Update the user's score
+    const updateScoreSql = 'UPDATE users SET score = score + 1 WHERE user_id = ?';
+        pool.query(updateScoreSql, [userId], (err, result) => {
+            if (err) {
+                console.error('Error updating user score:', err);
+                return res.status(500).json({ error: 'Failed to update user score' });
+            }
+
+            res.json({ success: true, message: 'Badge added to user successfully' });
+    });
+
 });
 
 router.get('/user-training-modules', (req, res) => {
@@ -421,6 +433,31 @@ router.get('/employees/organization/:organizationId', (req, res) => {
         }
         
         res.json(result);
+    });
+});
+
+router.get('/leaderboard/:organizationId', (req, res) => {
+    const organizationId = req.params.organizationId; 
+    
+    const qry = `
+    SELECT user_id, first_name, last_name, organization_id, score
+    FROM users
+    WHERE organization_id = ? AND user_role != 'managment'
+    ORDER BY score DESC;`
+
+    pool.query(qry, [organizationId], (err, result) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            return res.status(500).json({ error: 'Internal Server Error', details: err });
+        } else {
+            // Calculate leaderboard ranks dynamically
+            const leaderboard = result.map((user, index) => ({
+              ...user,
+              rank: index + 1,
+            }));
+
+        res.json(leaderboard);
+        }
     });
 });
 

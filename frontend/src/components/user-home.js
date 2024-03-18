@@ -10,6 +10,7 @@ function UserHome() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generatedPassword, setGeneratedPassword] = useState('');
+  const [leaderboard, setLeaderboard] = useState([]);
 
 
   
@@ -106,11 +107,17 @@ function UserHome() {
     }
   };
 
-
+  const fetchLeaderboard = async (organizationId) => {
+    try {
+      const response = await fetch(`http://localhost:4000/leaderboard/${user.organization_id}`)
+      const data = await response.json();
+      setLeaderboard(data);
+    } catch (error) {
+      console.error('Error fetching leaderboard data:', error);
+    }
+  };
 
   useEffect(() => {
-
-
     
     const fetchBadges = async () => {
       try {
@@ -146,6 +153,9 @@ function UserHome() {
       // This is necessary if no other data fetching is performed for non-managers
       setLoading(false);
     }
+
+    fetchLeaderboard();
+
   }, [user.user_id, user.user_role, user.organization_id]); // Added dependencies for useEffect
   
 
@@ -207,8 +217,21 @@ function UserHome() {
               <span>{user.organization_id}</span>
               <strong>User Role:</strong>
               <span>{user.user_role}</span>
+              <strong>Score:</strong>
+              <span>{user.score}</span>
+              {user.user_role !== 'management' && (
+                <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', columnGap: '20px' }}>
+                  <strong>Leaderboard Rank: </strong> 
+                  {leaderboard.map(employee => {
+                    if(employee.user_id === user.user_id) {
+                      return <span key={employee.user_id}> {employee.rank}</span>;
+                    }
+                    return null;
+                  })}
+                </div>
+              )}
+              </div>
           </div>
-      </div>
 
       <div style={{ flex: 1, backgroundColor: '#ffffff', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
           <h3>Your Badges:</h3>
