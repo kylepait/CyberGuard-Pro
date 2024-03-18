@@ -273,6 +273,12 @@ function ManagerMetricsDashboard() {
     }
   };
 
+  const handleUnenrollModuleChange = async (event) => {
+    const selectedValue = event.target.value;
+    
+    setSelectedUnenrollModule(selectedValue);
+  };
+
   const handleSetGoal = async (event) => {
       event.preventDefault();
 
@@ -307,12 +313,6 @@ function ManagerMetricsDashboard() {
           console.error('Error setting goal:', error);
           alert('Error setting goal');
       }
-  };
-
-  const handleUnenrollModuleChange = async (event) => {
-    const selectedValue = event.target.value;
-    
-    setSelectedUnenrollModule(selectedValue);
   };
 
   const [isAssignmentsVisible, setIsAssignmentsVisible] = useState(false);
