@@ -10,6 +10,9 @@ function UserHome() {
   const [employees, setEmployees] = useState([]);
   const [loading, setLoading] = useState(true);
   const [generatedPassword, setGeneratedPassword] = useState('');
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  const [latestGoal, setLatestGoal] = useState({});
 
 
   
@@ -106,11 +109,17 @@ function UserHome() {
     }
   };
 
-
+  const fetchLeaderboard = async (organizationId) => {
+    try {
+      const response = await fetch(`http://localhost:4000/leaderboard/${user.organization_id}`)
+      const data = await response.json();
+      setLeaderboard(data);
+    } catch (error) {
+      console.error('Error fetching leaderboard data:', error);
+    }
+  };
 
   useEffect(() => {
-
-
     
     const fetchBadges = async () => {
       try {
@@ -146,7 +155,37 @@ function UserHome() {
       // This is necessary if no other data fetching is performed for non-managers
       setLoading(false);
     }
+
+    fetchLeaderboard();
+
   }, [user.user_id, user.user_role, user.organization_id]); // Added dependencies for useEffect
+
+
+  useEffect(() => {
+    const fetchLatestGoal = async () => {
+      try {
+        const organizationId = user.organization_id;
+        const response = await fetch(`http://localhost:4000/goals/latest/${organizationId}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch the latest goal');
+        }
+        const data = await response.json();
+        console.log(data); // Confirm the structure of 'data'
+        setLatestGoal(data);
+      } catch (error) {
+        console.error('Fetch error:', error);
+      }
+    };
+  
+    fetchLatestGoal();
+  }, [user.organization_id]);
+  
+
+
+
+  
+
+
   
 
 
@@ -179,22 +218,21 @@ function UserHome() {
         </Link>
     )}
 
-    <div style={{ display: 'flex', marginBottom: '20px', gap: '20px' }}>
-      <div style={{ 
-          flex: 1, 
-          backgroundColor: '#ffffff', 
-          padding: '20px', 
-          borderRadius: '5px', 
-          boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-          display: 'flex',
-          flexDirection: 'column',
-          gap: '10px' }}>
+      <div style={{ display: 'flex', marginBottom: '20px', gap: '20px' }}>
+        <div style={{
+            flex: 1,
+            backgroundColor: '#f8f9fa', // Lighter background for subtle contrast
+            padding: '20px',
+            borderRadius: '8px', // Slightly larger radius for softer edges
+            boxShadow: '0 4px 6px rgba(0,0,0,0.1)', // Enhanced shadow for depth
+            display: 'flex',
+            flexDirection: 'column',
+            gap: '15px', // Increased gap for better spacing
+          }}>
           
-          <h2 style={{ margin: '0 0 10px 0', paddingBottom: '5px' }}>
-              Welcome, {user.username}!
-          </h2>
+          <h2 style={{ margin: '0 0 15px 0', paddingBottom: '10px', borderBottom: '2px solid #007bff' }}>Welcome, {user.first_name}!</h2>
           
-          <div style={{ display: 'grid', gridTemplateColumns: 'auto auto', columnGap: '20px', rowGap: '5px' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', columnGap: '20px', rowGap: '10px', padding: '10px', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.05)' }}>
               <strong>Email:</strong>
               <span>{user.email}</span>
               <strong>User ID:</strong>
@@ -207,8 +245,18 @@ function UserHome() {
               <span>{user.organization_id}</span>
               <strong>User Role:</strong>
               <span>{user.user_role}</span>
+              <strong>Score:</strong>
+              <span>{user.score}</span>
+              {user.user_role !== 'management' && (
+                <React.Fragment>
+                  <strong>Leaderboard Rank: </strong> 
+                  <span>
+                    {leaderboard.filter(employee => employee.user_id === user.user_id).map(employee => <span key={employee.user_id}>{employee.rank}</span>)}
+                  </span>
+                </React.Fragment>
+              )}
           </div>
-      </div>
+        </div>
 
       <div style={{ flex: 1, backgroundColor: '#ffffff', padding: '20px', borderRadius: '5px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
           <h3>Your Badges:</h3>
@@ -241,23 +289,33 @@ function UserHome() {
     </div>
 
     <input 
-          type="password" 
-          value={userPassword} 
-          onChange={handlePasswordChange} 
-          placeholder="Test Your Password"
-        />
+    type="password" 
+    value={userPassword} 
+    onChange={handlePasswordChange} 
+    placeholder="Test Your Password"
+/>
 
-        <div className={`strength-meter ${passwordStrength}`}>
-            <div className={`${passwordStrength}`}></div>
-        </div>
-        <div>Password Strength: {passwordStrength}</div>
-
-
-
+      <div className="strength-meter">
+          <div style={{
+              width: passwordStrength === "Very Weak" ? "20%" :
+                    passwordStrength === "Weak" ? "40%" :
+                    passwordStrength === "Moderate" ? "60%" :
+                    passwordStrength === "Strong" ? "80%" : 
+                    passwordStrength === "Very Strong" ? "100%" : "0%",
+              backgroundColor: passwordStrength === "Very Weak" ? "#ff3e3e" :
+                              passwordStrength === "Weak" ? "#ffae00" :
+                              passwordStrength === "Moderate" ? "#f7ff00" :
+                              passwordStrength === "Strong" ? "#90ee90" :
+                              passwordStrength === "Very Strong" ? "#008000" : "#dddddd",
+              height: "10px",
+              borderRadius: "5px"
+          }}></div>
+      </div>
+      <div>Password Strength: {passwordStrength}</div>
 
       {user.user_role === 'management' && (
         <div style={{ backgroundColor: '#f8f9fa', padding: '20px', borderRadius: '5px', color: '#343a40', marginTop: '20px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
-          <h3 style={{ color: '#17a2b8' }}>Employees in Your Organization:</h3>
+          <h3 style={{ color: '#007bff' }}>EMPLOYEES IN YOUR ORGANIZATION:</h3>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '15px' }}>
             {employees.map(employee => (
               <div key={employee.user_id} style={{ background: 'white', borderRadius: '5px', padding: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.05)' }}>
@@ -276,6 +334,30 @@ function UserHome() {
           </div>
         </div>
       )}
+
+  <div style={{ margin: '20px 0', padding: '20px', backgroundColor: '#f7f7f7', borderRadius: '10px', boxShadow: '0 2px 4px rgba(0,0,0,0.1)' }}>
+    {latestGoal ? (
+      <div>
+        <h3 style={{ color: '#007bff' }}>LATEST ORGANIZATION INCENTIVE</h3>
+        <p style={{ fontSize: '16px', margin: '10px 0' }}>
+          <strong>Incentive:</strong> {latestGoal.incentive || 'No incentive specified'}
+        </p>
+        <p style={{ fontSize: '16px', margin: '10px 0' }}>
+          <strong>Due Date:</strong> {latestGoal.due_date ? new Date(latestGoal.due_date).toLocaleDateString() : 'No due date'}
+        </p>
+        <p style={{ marginTop: '20px', fontSize: '16px', backgroundColor: '#dff0d8', padding: '10px', borderRadius: '5px', color: '#3c763d' }}>
+          Be number 1 on the leaderboard by the posted due date to earn your cybersecurity incentive award.
+        </p>
+      </div>
+    ) : (
+      <p style={{ fontSize: '16px', textAlign: 'center', color: '#888' }}>Loading latest goal...</p>
+    )}
+  </div>
+
+
+
+
+      
     </div>
   );
 }

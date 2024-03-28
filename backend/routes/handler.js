@@ -3,6 +3,8 @@ const router = express.Router();
 const pool = require('../config/db.js');
 const cors = require('cors')
 const bodyParser = require('body-parser');
+const util = require('util');
+
 
 // Use cors middleware
 router.use(cors());
@@ -77,7 +79,7 @@ router.get('/badges', (req, res) => {
 });
 
 // Endpoint to get badges of all employees in a manager's organization
-router.get('/badges/organization/:organizationId', (req, res) => {
+router.get('/badges/organization/:organizationId', async (req, res) => {
     const organizationId = req.params.organizationId;
     
     const qry = `
@@ -88,11 +90,8 @@ router.get('/badges/organization/:organizationId', (req, res) => {
         WHERE users.organization_id = ? AND users.user_role != 'management';
     `;
     
-    pool.query(qry, [organizationId], (err, result) => {
-        if (err) {
-            console.error('Error executing query:', err);
-            return res.status(500).json({ error: 'Internal Server Error', details: err });
-        }
+    try {
+        const [result] = await pool.promise().query(qry, [organizationId]);
         
         // Process result to group badges by user and include earned_date
         const employees = result.reduce((acc, curr) => {
@@ -122,7 +121,10 @@ router.get('/badges/organization/:organizationId', (req, res) => {
         }, []);
         
         res.json(employees);
-    });
+    } catch (err) {
+        console.error('Error executing query:', err);
+        res.status(500).json({ error: 'Internal Server Error', details: err });
+    }
 });
 
 router.post('/Login', (req, res) => {
@@ -180,6 +182,18 @@ router.post('/add-badge', (req, res) => {
         }
         res.json({ success: true, message: 'Badge added to user successfully' });
     });
+
+    // Update the user's score
+    const updateScoreSql = 'UPDATE users SET score = score + 1 WHERE user_id = ?';
+        pool.query(updateScoreSql, [userId], (err, result) => {
+            if (err) {
+                console.error('Error updating user score:', err);
+                return res.status(500).json({ error: 'Failed to update user score' });
+            }
+
+            res.json({ success: true, message: 'Badge added to user successfully' });
+    });
+
 });
 
 router.get('/user-training-modules', (req, res) => {
@@ -205,6 +219,7 @@ router.get('/user-training-modules', (req, res) => {
         res.json({ assignedModules, completedModules });
     });
 });
+
 
 router.post('/complete-training', async (req, res) => {
     const { userId, moduleId } = req.body;
@@ -287,7 +302,7 @@ router.post('/complete-training', async (req, res) => {
 router.get('/training-assignments/:organizationId', (req, res) => {
     const organizationId = req.params.organizationId;
     const qry = `
-        SELECT utm.user_id, u.username, u.first_name, u.last_name, tm.module_name, utm.status
+        SELECT utm.user_id, u.username, u.first_name, u.last_name, utm.module_id, tm.module_name, utm.status
         FROM user_training_modules utm
         JOIN users u ON utm.user_id = u.user_id
         JOIN training_modules tm ON utm.module_id = tm.module_id
@@ -342,6 +357,66 @@ router.post('/enroll-employee-training', (req, res) => {
     });
 });
 
+router.get('/enroll-modules/:selectedOption', (req, res) => {
+    const selectedOption = req.params.selectedOption;
+    
+    const qry = `
+        SELECT tm.module_id, tm.module_name
+        FROM training_modules tm
+        WHERE NOT EXISTS (
+            SELECT * 
+            FROM user_training_modules utm 
+            WHERE tm.module_id = utm.module_id 
+            AND utm.user_id = ?);
+    `;
+    pool.query(qry, [selectedOption], (err, results) => {
+        if (err) {
+            console.error('Error fetching training modules:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json(results);
+    });
+});
+
+router.get('/unenroll-modules/:selectedOption', (req, res) => {
+    const selectedOption = req.params.selectedOption;
+    
+    const qry = `
+        SELECT utm.user_id, utm.module_id, tm.module_name, utm.status
+        FROM user_training_modules utm
+        JOIN training_modules tm ON utm.module_id = tm.module_id
+        WHERE utm.user_id = ? AND utm.status = 'assigned';
+    `;
+    pool.query(qry, [selectedOption], (err, results) => {
+        if (err) {
+            console.error('Error fetching training modules:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json(results);
+    });
+});
+
+
+router.delete('/unenroll-employee-training', (req, res) => {
+    const { employeeUserId, moduleId } = req.body;
+    const managerId = req.managerId; // Determine managerId based on session or token
+
+    // Optional: Check if the employee belongs to the manager's organization
+    // and if the moduleId is valid, then proceed with unenrollment
+
+    const qry = 'DELETE FROM user_training_modules WHERE user_id = ? AND module_id = ? AND status = "assigned"';
+    pool.query(qry, [employeeUserId, moduleId], (err, results) => {
+        if (err) {
+            console.error('Error unenrolling employee from training module:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+
+        res.json({ success: true, message: 'Employee unenrolled from training module successfully' });
+    
+    });
+});
+
+
 router.get('/employees/organization/:organizationId', (req, res) => {
     const organizationId = req.params.organizationId;
     
@@ -358,6 +433,69 @@ router.get('/employees/organization/:organizationId', (req, res) => {
         }
         
         res.json(result);
+    });
+});
+
+router.post('/api/goals', (req, res) => {
+    const { organizationId, dueDate, incentive } = req.body;
+    
+    // Assuming your `pool` variable is properly set up for database operations
+    const query = `INSERT INTO goals (organization_id, due_date, incentive) VALUES (?, ?, ?)`;
+    pool.query(query, [organizationId, dueDate, incentive], (error, results) => {
+        if (error) {
+            console.error('Failed to set goal:', error);
+            res.status(500).json({ success: false, message: 'Failed to set goal' });
+        } else {
+            res.json({ success: true, message: 'Goal set successfully' });
+        }
+    });
+});
+
+router.get('/goals/latest/:organizationId', async (req, res) => {
+    const organizationId = req.params.organizationId;
+
+    const query = `
+        SELECT * FROM goals 
+        WHERE organization_id = ? 
+        ORDER BY due_date DESC 
+        LIMIT 1;
+    `;
+
+    try {
+        const [result] = await pool.promise().query(query, [organizationId]);
+        if (result.length > 0) {
+            res.json(result[0]);
+        } else {
+            res.status(404).json({ message: "No goals found for this organization." });
+        }
+    } catch (error) {
+        console.error('Failed to fetch latest goal:', error);
+        res.status(500).json({ message: 'Failed to fetch latest goal', error });
+    }
+});
+
+router.get('/leaderboard/:organizationId', (req, res) => {
+    const organizationId = req.params.organizationId; 
+    
+    const qry = `
+    SELECT user_id, first_name, last_name, organization_id, score
+    FROM users
+    WHERE organization_id = ? AND user_role != 'managment'
+    ORDER BY score DESC;`
+
+    pool.query(qry, [organizationId], (err, result) => {
+        if (err) {
+            console.error('Error executing query:', err);
+            return res.status(500).json({ error: 'Internal Server Error', details: err });
+        } else {
+            // Calculate leaderboard ranks dynamically
+            const leaderboard = result.map((user, index) => ({
+              ...user,
+              rank: index,
+            }));
+
+        res.json(leaderboard);
+        }
     });
 });
 
