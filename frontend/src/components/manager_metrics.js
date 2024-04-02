@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import MyChartComponent from './trainingModulesBarChart';
-import TrainingOverviewPieChart from './TrainingOverviewPieChart'; // Adjust the path as necessary
+import TrainingOverviewPieChart from './trainingOverviewPieChart'; // Adjust the path as necessary
 
 
 
 function ManagerMetricsDashboard() {
+
+
+
+
   const [assignedModules, setAssignedModules] = useState([]);
   const [completedModules, setCompletedModules] = useState([]);
 
@@ -43,12 +47,15 @@ function ManagerMetricsDashboard() {
 
 
 
+
+
   const refreshAllData = async () => {
     await fetchTrainingAssignments();
     await fetchEmployeeBadges();
     await fetchAllTrainings();
     await fetchTrainingAssignments();
     await fetchBadges();
+    await fetchTrainingModules();
   
 
     await fetchEnrollEmployees();
@@ -56,11 +63,15 @@ function ManagerMetricsDashboard() {
     // Include any other fetch calls needed to refresh your UI accordingly
   };
 
-    const [chartData, setChartData] = useState({
-      labels: [], // Employee names
-      assignedCount: [], // Number of assigned trainings per employee
-      completedCount: [], // Number of completed trainings per employee
-    });
+  const [chartData, setChartData] = useState({
+    labels: [], // Employee names
+    assignedCount: [], // Number of assigned trainings per employee
+    completedCount: [], // Number of completed trainings per employee
+  });
+
+
+
+
   
   
 
@@ -225,12 +236,23 @@ function ManagerMetricsDashboard() {
   };
 
   const fetchTrainingModules = async () => {
-    const response = await fetch(`http://localhost:4000/user-training-modules?userId=${user.user_id}`);
+    // Assuming `user.organization_id` holds the organization ID of the logged-in manager
+    const organizationId = user.organization_id;
+  
+    // Adjust the API endpoint or add parameters as necessary to fetch data filtered by organization ID
+    const response = await fetch(`http://localhost:4000/training-modules?organizationId=${organizationId}`);
     const data = await response.json();
-
-    setAssignedModules(data.assignedModules);
-    setCompletedModules(data.completedModules);
+  
+    console.log("Fetched training modules data for organization:", organizationId, data); // Debug fetched data
+  
+    // Assuming the API returns data in a structure where you can segregate assigned and completed modules
+    const assignedModules = data.filter(module => module.status === 'assigned');
+    const completedModules = data.filter(module => module.status === 'completed');
+  
+    setAssignedModules(assignedModules);
+    setCompletedModules(completedModules);
   };
+  
 
   const fetchEnrollEmployees = async () => {
     const response = await fetch(`http://localhost:4000/employees/organization/${user.organization_id}`);
@@ -324,6 +346,8 @@ function ManagerMetricsDashboard() {
 
 
 
+
+
   function getSecuritySuggestionForModule(moduleId) {
     // Example: Predefined suggestions
     const suggestions = {
@@ -344,8 +368,40 @@ function ManagerMetricsDashboard() {
   
     return suggestions[moduleId] || 'No specific suggestion available. Ensure all security trainings are completed.';
   }
-  
 
+
+
+
+    const [trainingData, setTrainingData] = useState({
+      labels: [], // Employee names
+      assignedCount: [], // Total Assigned Trainings across all employees
+      completedCount: [], // Total Completed Trainings across all employees
+    });
+  
+    useEffect(() => {
+      // Your existing logic to fetch or define trainingAssignments
+      // Assume trainingAssignments is an array of assignments with user_id, status, etc.
+      const tempChartData = {
+        labels: [],
+        assignedCount: 0,
+        completedCount: 0,
+      };
+  
+      // Example logic to accumulate total completed and assigned trainings
+      trainingAssignments.forEach(assignment => {
+        if (assignment.status === 'completed') {
+          tempChartData.completedCount++;
+        } else {
+          tempChartData.assignedCount++;
+        }
+      });
+  
+      setTrainingData(tempChartData);
+      // Add any dependencies to this useEffect if necessary
+    }, [trainingAssignments]); // Include dependencies if your trainingAssignments data might change
+
+  
+  
   
 
   return (
@@ -384,6 +440,18 @@ function ManagerMetricsDashboard() {
 
             
         <MyChartComponent chartData={chartData} />
+
+        <div style={{justifyContent: 'center', alignItems: 'center'}}>
+          <h3>Organization Training Overview (Completed v Assigned)</h3>
+          <TrainingOverviewPieChart
+            trainingData={[
+              {
+                completedCount: trainingData.completedCount,
+                assignedCount: trainingData.assignedCount,
+              },
+            ]}
+          />
+        </div>
 
   
       
