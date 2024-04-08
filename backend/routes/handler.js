@@ -223,6 +223,7 @@ router.get('/user-training-modules', (req, res) => {
 
 router.post('/complete-training', async (req, res) => {
     const { userId, moduleId } = req.body;
+    const endTime = new Date();
 
     // Start a transaction
     pool.getConnection((err, connection) => {
@@ -233,10 +234,11 @@ router.post('/complete-training', async (req, res) => {
             // Update the training module status to completed
             const updateTrainingSql = `
                 UPDATE user_training_modules
-                SET status = 'completed'
+                SET status = 'completed', end_time = ?
                 WHERE user_id = ? AND module_id = ?;
             `;
-            connection.query(updateTrainingSql, [userId, moduleId], (err, result) => {
+
+            connection.query(updateTrainingSql, [endTime, userId, moduleId], (err, result) => {
                 if (err) {
                     return connection.rollback(() => {
                         throw err;
@@ -491,17 +493,36 @@ router.get('/leaderboard/:organizationId', (req, res) => {
     });
 });
 
+router.post('/start-module/:userId/:moduleId', async (req, res) => {
+    const { userId, moduleId } = req.params;
+    const startTime = new Date();
+
+    const updateStartTime = `
+        UPDATE user_training_modules
+        SET start_time = ?
+        WHERE user_id = ? AND module_id = ?;
+    `;
+
+    pool.query(updateStartTime, [startTime, userId, moduleId], (err, result) => {
+        if (err) {
+            console.error('Error starting training module:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json({ success: true, message: 'Training module started successfully' });
+    });
+});
+
 router.post('/start-training', async (req, res) => {
     const { userId, moduleId } = req.body;
     const startTime = new Date();
 
-    const updateDuration =  `
+    const updateStartTime =  `
         UPDATE user_training_modules
-        SET duration = ?
+        SET start_time = ?
         WHERE user_id = ? AND module_id = ?;
     `;
 
-    pool.query(updateDuration, [startTime, userId, moduleId], (err, result) => {
+    pool.query(updateStartTime, [startTime, userId, moduleId], (err, result) => {
         if(err) {
             console.error('Error starting training module:', err);
             return res.status(500).json({ error: 'Internal Server Error' });
@@ -510,44 +531,26 @@ router.post('/start-training', async (req, res) => {
     });
 });
 
-router.get('/startModule/:', (req, res) => {
+router.get('/module/:moduleId', async (req, res) => {
+    const moduleId = req.params.moduleId;
+
+    const query = 'SELECT * FROM training_modules WHERE module_id = ?';
+
+    try {
+        const [result] = await pool.query(query, [moduleId]);
+        if (result.length > 0) {
+            res.json(result[0]); // Assuming you want to return only one module
+        } else {
+            res.status(404).json({ message: 'Module not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching module details:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
 
 });
 
-router.post('/end-training', async (req, res) => {
-    const { userId, moduleId } = req.body;
-    const endTime = new Date();
 
-    const qry = 'SELECT duration FROM user_training_modules WHERE user_id = ? AND module_id = ?';
-    pool.query(qry, [userId, moduleId], (err, result) => {
-        if (err) {
-            console.error('Error ending training module:', err);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
-
-        if (result.length === 0) {
-            return res.status(404).json({ error: 'Training module not found' });
-        }
-
-        const startTime = result[0].duration;
-        const durationSecs = Math.floor((endTime - startTime) / 1000); // Duration in seconds
-
-        const updateDuration =  `
-            UPDATE user_training_modules
-            SET duration = ?
-            WHERE user_id = ? AND module_id = ?;
-        `;
-
-        pool.query(updateDuration, [durationSecs, userId, moduleId], (err, res) => {
-            if(err) {
-                console.error('Error ending training module:', err);
-                return res.status(500).json({ error: 'Internal Server Error' });
-            }
-            res.json({ success: true, message: 'Training module ended successfully' });
-        });
-    });
-    
-});
 
 
 module.exports = router;

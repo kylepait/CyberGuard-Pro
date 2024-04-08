@@ -3,7 +3,7 @@ import { Link, useNavigate  } from 'react-router-dom';
 
 ///Testing out opening a new branch. I've been working main thus far
 
-function TrainingModulesPage() {
+function TrainingModulesPage( { userId } ) {
   const [assignedModules, setAssignedModules] = useState([]);
   const [completedModules, setCompletedModules] = useState([]);
 
@@ -147,16 +147,16 @@ function TrainingModulesPage() {
   };
 
   const gradePassword = async (moduleId) => {
-  var pass = document.getElementById("password");
-  if (pass.value.length > 3)
-  {
-    completeTraining(moduleId);
-  }
-  else
-  {
-    alert('password is too weak');
-  }
-  }
+    var pass = document.getElementById("password");
+    if (pass.value.length > 3)
+    {
+      completeTraining(moduleId);
+    }
+    else
+    {
+      alert('password is too weak');
+    }
+  };
 
 
   return (
@@ -173,33 +173,8 @@ function TrainingModulesPage() {
         {assignedModules.map(module => (
           <div key={module.module_id} style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', padding: '20px', borderRadius: '10px', height: '550px' }}>
             <h3>{module.module_name}</h3>
-            <button 
-                  onClick={() => startTraining(module.module_id)}> 
-                  Start Training
-            </button>
-            <iframe src={module.module_link} width="100%" height="400" title={module.module_type} style={{ border: 'none', marginBottom: '10px' }}></iframe>
-            {module.module_format === 'slides' && (
-            <>
-            <button
-                  onClick={() => completeTraining(module.module_id)}
-                  style={{ backgroundColor: 'green', color: 'white', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', border: 'none', width: '100%' }}>
-                  I attest to completing this training
-            </button>
-            </>
-            )}
-            {module.module_format === 'password' && (
-            <>
-            <input
-                  type="password" id="password" placeholder="Password">
-            </input>
-            <button
-                              
-                  onClick={() => gradePassword(module.module_id)}
-                  style={{ backgroundColor: 'green', color: 'white', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', border: 'none', width: '100%' }}>
-                  This will be my password for the shown website
-            </button>
-            </>
-            )}
+            <Link to={`/start-module/${userId}/${module.moduleId}`} style={{ margin: '10px 10px 10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
+              Start Module</Link>
           </div>
         ))}
       </div>
