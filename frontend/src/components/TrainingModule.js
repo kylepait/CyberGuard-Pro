@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate  } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import TrainingModuleContent from './TrainingModuleContent';
 
 ///Testing out opening a new branch. I've been working main thus far
 
-function TrainingModulesPage( { userId } ) {
+function TrainingModules() {
   const [assignedModules, setAssignedModules] = useState([]);
   const [completedModules, setCompletedModules] = useState([]);
 
@@ -19,8 +20,6 @@ function TrainingModulesPage( { userId } ) {
 
   const [employees, setEmployees] = useState([]);
 
-  const navigate = useNavigate();
-
   const enrollEmployeeInTraining = async () => {
       const response = await fetch('http://localhost:4000/enroll-employee-training', {
           method: 'POST',
@@ -30,14 +29,12 @@ function TrainingModulesPage( { userId } ) {
       const data = await response.json();
       if (data.success) {
           alert('Employee enrolled successfully!');
-          // Optionally: Refresh the list of enrolled trainings
           fetchTrainingAssignments(); // Call this function to refresh assignments
 
       } else {
           alert('Failed to enroll employee.');
       }
   };
-
 
 
   useEffect(() => {
@@ -103,58 +100,19 @@ function TrainingModulesPage( { userId } ) {
   const startTraining = async (moduleId) => {
     try {
       const response = await fetch('http://localhost:4000/start-training', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: user.user_id, moduleId }),
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.user_id, moduleId: moduleId })
       });
-
       const data = await response.json();
-      if(data.success) {
-        alert('Training module started successfully!');
-        navigate('/StartModule');
+      if (data.success) {
+        console.log('Training started successfully!');
       } else {
-        alert('Failed to start training module.');
+        alert('Failed to start training.');
       }
     } catch (error) {
       console.error('Error starting training:', error);
       alert('Error starting training');
-    }
-  };
-
-  const completeTraining = async (moduleId) => {
-    try {
-      const response = await fetch('http://localhost:4000/complete-training', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: user.user_id, moduleId }),
-      });
-
-      const data = await response.json();
-      if (data.success) {
-        alert('Training completed successfully!');
-        fetchTrainingModules(); // Refresh the modules to reflect the completion
-      } else {
-        alert('Failed to complete training.');
-      }
-    } catch (error) {
-      console.error('Error completing training:', error);
-      alert('Error completing training');
-    }
-  };
-
-  const gradePassword = async (moduleId) => {
-    var pass = document.getElementById("password");
-    if (pass.value.length > 3)
-    {
-      completeTraining(moduleId);
-    }
-    else
-    {
-      alert('password is too weak');
     }
   };
 
@@ -167,17 +125,24 @@ function TrainingModulesPage( { userId } ) {
       Home Page
     </Link>
 
-    <div style={{ padding: '20px' }}>
-      <h2>Assigned Training Modules</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(800px, 1fr))', gap: '20px' }}>
-        {assignedModules.map(module => (
-          <div key={module.module_id} style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', padding: '20px', borderRadius: '10px', height: '550px' }}>
-            <h3>{module.module_name}</h3>
-            <Link to={`/start-module/${userId}/${module.moduleId}`} style={{ margin: '10px 10px 10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
-              Start Module</Link>
-          </div>
+    <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ccc', borderRadius: '5px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', backgroundColor: '#f0f8ff' }}>
+      <h2 style={{ borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>Assigned Training Modules</h2>
+      <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
+        {assignedModules.map((module) => (
+          <li key={module.module_id} style={{ padding: '10px 0', borderBottom: '1px solid #eee' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: '0' }}>{module.module_name}</h3>
+              <Link key={module.module_id} to={`/TrainingModuleContent/${module.module_id}/${user.user_id}`}>
+                <button onClick={() => startTraining(module.module_id)}
+                  style={{ backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>                   
+                  Start Training
+                  </button>
+              </Link>
+            </div>
+           </li>
         ))}
-      </div>
+      </ul>
+    </div>
 
       
       <h2 style={{ marginTop: '40px' }}>Completed Training Modules</h2>
@@ -244,9 +209,8 @@ function TrainingModulesPage( { userId } ) {
         </>
       )}
     </div>
-    </div>
     
   );
 }
 
-export default TrainingModulesPage;
+export default TrainingModules;

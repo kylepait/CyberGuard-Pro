@@ -493,8 +493,26 @@ router.get('/leaderboard/:organizationId', (req, res) => {
     });
 });
 
-router.post('/start-module/:userId/:moduleId', async (req, res) => {
-    const { userId, moduleId } = req.params;
+router.get('/module-content/:moduleId', async (req, res) => {
+    const moduleId = req.params.moduleId;
+
+    const query = 'SELECT * FROM training_modules WHERE module_id = ?';
+
+    try {
+        const [rows, fields] = await pool.promise().query(query, [moduleId]); 
+        if (rows.length > 0) {
+            res.json(rows[0]);
+        } else {
+            res.status(404).json({ message: 'Module not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching module details:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+router.post('/start-training', async (req, res) => {
+    const { userId, moduleId } = req.body;
     const startTime = new Date();
 
     const updateStartTime = `
@@ -511,45 +529,6 @@ router.post('/start-module/:userId/:moduleId', async (req, res) => {
         res.json({ success: true, message: 'Training module started successfully' });
     });
 });
-
-router.post('/start-training', async (req, res) => {
-    const { userId, moduleId } = req.body;
-    const startTime = new Date();
-
-    const updateStartTime =  `
-        UPDATE user_training_modules
-        SET start_time = ?
-        WHERE user_id = ? AND module_id = ?;
-    `;
-
-    pool.query(updateStartTime, [startTime, userId, moduleId], (err, result) => {
-        if(err) {
-            console.error('Error starting training module:', err);
-            return res.status(500).json({ error: 'Internal Server Error' });
-        }
-        res.json({ success: true, message: 'Training module started successfully' });
-    });
-});
-
-router.get('/module/:moduleId', async (req, res) => {
-    const moduleId = req.params.moduleId;
-
-    const query = 'SELECT * FROM training_modules WHERE module_id = ?';
-
-    try {
-        const [result] = await pool.query(query, [moduleId]);
-        if (result.length > 0) {
-            res.json(result[0]); // Assuming you want to return only one module
-        } else {
-            res.status(404).json({ message: 'Module not found' });
-        }
-    } catch (error) {
-        console.error('Error fetching module details:', error);
-        res.status(500).json({ error: 'Internal Server Error' });
-    }
-
-});
-
 
 
 
