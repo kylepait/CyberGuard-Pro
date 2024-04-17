@@ -167,7 +167,10 @@ function TrainingModulesPage() {
             )}
             {module.module_format === 'slidesQ' && (
             <>
-            <Link to='/ModuleQuiz' style={{ margin: '10px 10px 10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
+            <Link to='/ModuleQuiz'
+              onClick={() => localStorage.setItem('openQuiz', module.module_id)}
+              style={{ margin: '10px 10px 10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
+              
             Begin Quiz
             </Link>
             </>
