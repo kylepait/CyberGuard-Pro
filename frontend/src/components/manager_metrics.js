@@ -485,7 +485,14 @@ function ManagerMetricsDashboard() {
                           justifyContent: 'space-between',
                           alignItems: 'center',
                       }}>
+                        
                           <span style={{ fontWeight: 'bold' }}>{assignment.module_name}</span>
+                          {assignment.module_format === 'slidesQ' && (
+                          <>
+                          <span style={{ fontWeight: 'bold' }}>{assignment.score}/5</span>
+                          </>
+                          )}
+                          
                           <span style={{ 
                               padding: '5px 10px', 
                               borderRadius: '5px', 

@@ -380,7 +380,7 @@ router.post('/complete-scored-training', async (req, res) => {
 router.get('/training-assignments/:organizationId', (req, res) => {
     const organizationId = req.params.organizationId;
     const qry = `
-        SELECT utm.user_id, u.username, u.first_name, u.last_name, utm.module_id, tm.module_name, utm.status
+        SELECT utm.user_id, u.username, u.first_name, u.last_name, utm.module_id, tm.module_name, tm.module_format, utm.status, utm.score
         FROM user_training_modules utm
         JOIN users u ON utm.user_id = u.user_id
         JOIN training_modules tm ON utm.module_id = tm.module_id
