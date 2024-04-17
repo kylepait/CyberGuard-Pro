@@ -180,21 +180,21 @@ router.post('/add-badge', (req, res) => {
             console.error('Error adding badge to user:', err);
             return res.status(500).json({ error: 'Failed to add badge to user' });
         }
-        res.json({ success: true, message: 'Badge added to user successfully' });
-    });
 
-    // Update the user's score
-    const updateScoreSql = 'UPDATE users SET score = score + 1 WHERE user_id = ?';
-        pool.query(updateScoreSql, [userId], (err, result) => {
+        // Update the user's score
+        const updateScoreSql = 'UPDATE users SET score = score + 1 WHERE user_id = ?';
+        pool.query(updateScoreSql, [userId], (err, scoreResult) => {
             if (err) {
                 console.error('Error updating user score:', err);
                 return res.status(500).json({ error: 'Failed to update user score' });
             }
-
-            res.json({ success: true, message: 'Badge added to user successfully' });
+            // Now send a single response
+            res.json({ success: true, message: 'Badge added and score updated successfully' });
+        });
     });
-
 });
+
+
 
 router.get('/user-training-modules', (req, res) => {
     const userId = req.query.userId;
