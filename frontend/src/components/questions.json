@@ -1,28 +1,69 @@
 [
     {
+      "question": "Quiz will begin after clicking start",
+      "options": ["start"],
+      "answer": "start",
+      "batch": "0"
+    },
+    {
       "question": "Which of the following is considered a strong password?",
       "options": ["123456", "password", "letmein", "P@ssw0rd!"],
-      "answer": "P@ssw0rd!"
+      "answer": "P@ssw0rd!",
+      "batch": "0"
     },
     {
       "question": "What does 'Phishing' attempt to do?",
       "options": ["Strengthen your firewall", "Trick users into providing sensitive information", "Increase internet speed", "Encrypt personal files"],
-      "answer": "Trick users into providing sensitive information"
+      "answer": "Trick users into providing sensitive information",
+      "batch": "0"
     },
     {
       "question": "What is the purpose of two-factor authentication?",
       "options": ["To slow down the login process", "To provide an additional layer of security", "To monitor user activities", "To backup data automatically"],
-      "answer": "To provide an additional layer of security"
+      "answer": "To provide an additional layer of security",
+      "batch": "0"
     },
     {
       "question": "Which of the following is not a type of malware?",
       "options": ["Virus", "Trojan horse", "Adware", "Blockchain"],
-      "answer": "Blockchain"
+      "answer": "Blockchain",
+      "batch": "0"
     },
     {
       "question": "What action should you take if you receive a suspicious email attachment?",
       "options": ["Open it to see what it is", "Delete the email immediately", "Forward it to your friends", "Download and share the attachment"],
-      "answer": "Delete the email immediately"
+      "answer": "Delete the email immediately",
+      "batch": "0"
+    },
+    {
+      "question": "Which of these emails belongs to the company?",
+      "options": ["wrongexample1@gmail.com", "wrongexample2@gmail.com", "correctexample@gmail.com", "wrongexample3@gmail.com"],
+      "answer": "correctexample@gmail.com",
+      "batch": "9"
+    },
+    {
+      "question": "click 0",
+      "options": ["1","0","1","1"],
+      "answer": "0",
+      "batch": "9"
+    },
+    {
+      "question": "click 0",
+      "options": ["1","1","0","1"],
+      "answer": "0",
+      "batch": "9"
+    },
+    {
+      "question": "click 0",
+      "options": ["1","1","1","0"],
+      "answer": "0",
+      "batch": "9"
+    },
+    {
+      "question": "click 0",
+      "options": ["0","1","1","1"],
+      "answer": "0",
+      "batch": "9"
     }
   ]
   

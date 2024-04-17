@@ -13,7 +13,6 @@ function TrainingModulesPage() {
 
   const user = JSON.parse(localStorage.getItem('user'));
 
-
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [selectedModule, setSelectedModule] = useState('');
 
@@ -37,7 +36,6 @@ function TrainingModulesPage() {
   };
 
 
-
   useEffect(() => {
 
       fetchAllTrainings();
@@ -58,9 +56,7 @@ function TrainingModulesPage() {
       
       fetchEmployees();
 
-
     }, [user.user_id, user.user_role, user.organization_id]);
-
 
   // Declare fetchAllTrainings outside useEffect
   const fetchAllTrainings = async () => {
@@ -121,6 +117,18 @@ function TrainingModulesPage() {
     }
   };
 
+  const beginQuiz = async (moduleId) => {
+    var pass = document.getElementById("password");
+    if (pass.value.length > 3)
+    {
+      completeTraining(moduleId);
+    }
+    else
+    {
+      alert('password is too weak');
+    }
+    }
+  
   const gradePassword = async (moduleId) => {
   var pass = document.getElementById("password");
   if (pass.value.length > 3)
@@ -132,7 +140,6 @@ function TrainingModulesPage() {
     alert('password is too weak');
   }
   }
-
 
   return (
     
@@ -156,6 +163,16 @@ function TrainingModulesPage() {
                   style={{ backgroundColor: 'green', color: 'white', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', border: 'none', width: '100%' }}>
                   I attest to completing this training
             </button>
+            </>
+            )}
+            {module.module_format === 'slidesQ' && (
+            <>
+            <Link to='/ModuleQuiz'
+              onClick={() => localStorage.setItem('openQuiz', module.module_id)}
+              style={{ margin: '10px 10px 10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
+              
+            Begin Quiz
+            </Link>
             </>
             )}
             {module.module_format === 'password' && (
@@ -246,3 +263,4 @@ function TrainingModulesPage() {
 }
 
 export default TrainingModulesPage;
+
