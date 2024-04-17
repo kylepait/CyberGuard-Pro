@@ -9,11 +9,10 @@ import DevHub from './components/dev_hub';
 import TriviaGame from './components/triviaGame';
 import QuizPopup from './components/QuizPopup';
 import BarChart from './components/trainingModulesBarChart';
-
-
 import Nav from './components/Nav';
 
 import { BrowserRouter as Router, Routes, Route} from 'react-router-dom';
+import ModuleQuiz from './components/ModuleQuiz';
 
 function App() {
   return (
@@ -30,6 +29,7 @@ function App() {
             <Route path="/triviaGame" element={<TriviaGame/>} />
             <Route path="/QuizPopup" element={<QuizPopup/>}/>
             <Route path="/trainingModulesBarChart" element={<BarChart/>}/>
+            <Route path="/ModuleQuiz" element={<ModuleQuiz/>}/>
 
 
           </Routes>
