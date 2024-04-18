@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate  } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import TrainingModuleContent from './TrainingModuleContent';
 
 ///Testing out opening a new branch. I've been working main thus far
 
-function TrainingModulesPage() {
+function TrainingModules() {
   const [assignedModules, setAssignedModules] = useState([]);
   const [completedModules, setCompletedModules] = useState([]);
 
@@ -12,6 +13,7 @@ function TrainingModulesPage() {
   const [trainingAssignments, setTrainingAssignments] = useState([]);
 
   const user = JSON.parse(localStorage.getItem('user'));
+
 
   const [selectedEmployee, setSelectedEmployee] = useState('');
   const [selectedModule, setSelectedModule] = useState('');
@@ -27,7 +29,6 @@ function TrainingModulesPage() {
       const data = await response.json();
       if (data.success) {
           alert('Employee enrolled successfully!');
-          // Optionally: Refresh the list of enrolled trainings
           fetchTrainingAssignments(); // Call this function to refresh assignments
 
       } else {
@@ -56,7 +57,9 @@ function TrainingModulesPage() {
       
       fetchEmployees();
 
+
     }, [user.user_id, user.user_role, user.organization_id]);
+
 
   // Declare fetchAllTrainings outside useEffect
   const fetchAllTrainings = async () => {
@@ -94,52 +97,25 @@ function TrainingModulesPage() {
     setCompletedModules(data.completedModules);
   };
 
-  const completeTraining = async (moduleId) => {
+  const startTraining = async (moduleId) => {
     try {
-      const response = await fetch('http://localhost:4000/complete-training', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId: user.user_id, moduleId }),
+      const response = await fetch('http://localhost:4000/start-training', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: user.user_id, moduleId: moduleId })
       });
-
       const data = await response.json();
       if (data.success) {
-        alert('Training completed successfully!');
-        fetchTrainingModules(); // Refresh the modules to reflect the completion
+        console.log('Training started successfully!');
       } else {
-        alert('Failed to complete training.');
+        alert('Failed to start training.');
       }
     } catch (error) {
-      console.error('Error completing training:', error);
-      alert('Error completing training');
+      console.error('Error starting training:', error);
+      alert('Error starting training');
     }
   };
 
-  const beginQuiz = async (moduleId) => {
-    var pass = document.getElementById("password");
-    if (pass.value.length > 3)
-    {
-      completeTraining(moduleId);
-    }
-    else
-    {
-      alert('password is too weak');
-    }
-    }
-  
-  const gradePassword = async (moduleId) => {
-  var pass = document.getElementById("password");
-  if (pass.value.length > 3)
-  {
-    completeTraining(moduleId);
-  }
-  else
-  {
-    alert('password is too weak');
-  }
-  }
 
   return (
     
@@ -149,48 +125,24 @@ function TrainingModulesPage() {
       Home Page
     </Link>
 
-    <div style={{ padding: '20px' }}>
-      <h2>Assigned Training Modules</h2>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(800px, 1fr))', gap: '20px' }}>
-        {assignedModules.map(module => (
-          <div key={module.module_id} style={{ boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', padding: '20px', borderRadius: '10px', height: '550px' }}>
-            <h3>{module.module_name}</h3>
-            <iframe src={module.module_link} width="100%" height="400" title={module.module_type} style={{ border: 'none', marginBottom: '10px' }}></iframe>
-            {module.module_format === 'slides' && (
-            <>
-            <button
-                  onClick={() => completeTraining(module.module_id)}
-                  style={{ backgroundColor: 'green', color: 'white', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', border: 'none', width: '100%' }}>
-                  I attest to completing this training
-            </button>
-            </>
-            )}
-            {module.module_format === 'slidesQ' && (
-            <>
-            <Link to='/ModuleQuiz'
-              onClick={() => localStorage.setItem('openQuiz', module.module_id)}
-              style={{ margin: '10px 10px 10px 0', display: 'inline-block', textDecoration: 'none', padding: '10px', backgroundColor: '#007bff', color: 'white', borderRadius: '5px' }}>
-              
-            Begin Quiz
-            </Link>
-            </>
-            )}
-            {module.module_format === 'password' && (
-            <>
-            <input
-                  type="password" id="password" placeholder="Password">
-            </input>
-            <button
-                              
-                  onClick={() => gradePassword(module.module_id)}
-                  style={{ backgroundColor: 'green', color: 'white', borderRadius: '5px', padding: '10px 20px', cursor: 'pointer', border: 'none', width: '100%' }}>
-                  This will be my password for the shown website
-            </button>
-            </>
-            )}
-          </div>
+    <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ccc', borderRadius: '5px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', backgroundColor: '#f0f8ff' }}>
+      <h2 style={{ borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>Assigned Training Modules</h2>
+      <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
+        {assignedModules.map((module) => (
+          <li key={module.module_id} style={{ padding: '10px 0', borderBottom: '1px solid #eee' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <h3 style={{ margin: '0' }}>{module.module_name}</h3>
+              <Link key={module.module_id} to={`/TrainingModuleContent/${module.module_id}/${user.user_id}`}>
+                <button onClick={() => startTraining(module.module_id)}
+                  style={{ backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '5px', padding: '5px 10px', cursor: 'pointer' }}>                   
+                  Start Training
+                  </button>
+              </Link>
+            </div>
+           </li>
         ))}
-      </div>
+      </ul>
+    </div>
 
       
       <h2 style={{ marginTop: '40px' }}>Completed Training Modules</h2>
@@ -257,10 +209,8 @@ function TrainingModulesPage() {
         </>
       )}
     </div>
-    </div>
     
   );
 }
 
-export default TrainingModulesPage;
-
+export default TrainingModules;

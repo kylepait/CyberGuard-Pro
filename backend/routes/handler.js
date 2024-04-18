@@ -224,6 +224,7 @@ router.get('/user-training-modules', (req, res) => {
 
 router.post('/complete-training', async (req, res) => {
     const { userId, moduleId } = req.body;
+    const endTime = new Date();
 
     // Start a transaction
     pool.getConnection((err, connection) => {
@@ -234,10 +235,11 @@ router.post('/complete-training', async (req, res) => {
             // Update the training module status to completed
             const updateTrainingSql = `
                 UPDATE user_training_modules
-                SET status = 'completed'
+                SET status = 'completed', end_time = ?
                 WHERE user_id = ? AND module_id = ?;
             `;
-            connection.query(updateTrainingSql, [userId, moduleId], (err, result) => {
+
+            connection.query(updateTrainingSql, [endTime, userId, moduleId], (err, result) => {
                 if (err) {
                     return connection.rollback(() => {
                         throw err;
@@ -301,6 +303,7 @@ router.post('/complete-training', async (req, res) => {
 
 router.post('/complete-scored-training', async (req, res) => {
     const { userId, moduleId, score } = req.body;
+    const endTime = new Date();
 
     // Start a transaction
     pool.getConnection((err, connection) => {
@@ -311,10 +314,10 @@ router.post('/complete-scored-training', async (req, res) => {
             // Update the training module status to completed
             const updateTrainingSql = `
                 UPDATE user_training_modules
-                SET status = 'completed', score = ?
+                SET status = 'completed', score = ?, end_time = ?
                 WHERE user_id = ? AND module_id = ?;
             `;
-            connection.query(updateTrainingSql, [score, userId, moduleId], (err, result) => {
+            connection.query(updateTrainingSql, [score, endTime, userId, moduleId], (err, result) => {
                 if (err) {
                     return connection.rollback(() => {
                         throw err;
@@ -574,6 +577,43 @@ router.get('/leaderboard/:organizationId', (req, res) => {
 
         res.json(leaderboard);
         }
+    });
+});
+
+router.get('/module-content/:moduleId', async (req, res) => {
+    const moduleId = req.params.moduleId;
+
+    const query = 'SELECT * FROM training_modules WHERE module_id = ?';
+
+    try {
+        const [rows, fields] = await pool.promise().query(query, [moduleId]); 
+        if (rows.length > 0) {
+            res.json(rows[0]);
+        } else {
+            res.status(404).json({ message: 'Module not found' });
+        }
+    } catch (error) {
+        console.error('Error fetching module details:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+router.post('/start-training', async (req, res) => {
+    const { userId, moduleId } = req.body;
+    const startTime = new Date();
+
+    const updateStartTime = `
+        UPDATE user_training_modules
+        SET start_time = ?
+        WHERE user_id = ? AND module_id = ?;
+    `;
+
+    pool.query(updateStartTime, [startTime, userId, moduleId], (err, result) => {
+        if (err) {
+            console.error('Error starting training module:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json({ success: true, message: 'Training module started successfully' });
     });
 });
 
