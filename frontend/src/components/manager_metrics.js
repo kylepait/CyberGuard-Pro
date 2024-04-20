@@ -472,7 +472,7 @@ function ManagerMetricsDashboard() {
   
       
         <>
-        <div style={{ marginTop: '40px', backgroundColor: '#f2f2f2', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', width: '80%' }}>
+        <div style={{ marginTop: '40px', backgroundColor: '#f2f2f2', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
           <h2 style={{ cursor: 'pointer' }}>
               Training Assignments for My Employees
           </h2>
