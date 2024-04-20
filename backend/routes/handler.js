@@ -638,4 +638,28 @@ router.get('/average-time/:organizationId', (req, res) => {
     });
 });
 
+router.get('/security-score/:organizationId', (req, res) => {
+    const organizationId = req.params.organizationId;
+    const qry = `
+        SELECT COUNT(CASE WHEN utm.status = 'assigned' THEN 1 END) AS assigned_count,
+               COUNT(CASE WHEN utm.status = 'completed' THEN 1 END) AS completed_count
+        FROM user_training_modules utm
+        JOIN users u ON utm.user_id = u.user_id
+        WHERE u.organization_id = ?;
+    `;
+
+    pool.query(qry, [organizationId], (err, results) => {
+        if (err) {
+            console.error('Error fetching security score:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        const assignedCount = results[0].assigned_count;
+        const completedCount = results[0].completed_count;
+        const ratio = (completedCount / (completedCount + assignedCount)) * 100; 
+        const score = ratio.toFixed(2);
+        res.json({ security_score: score });
+    });
+});
+
+
 module.exports = router;

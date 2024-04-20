@@ -44,7 +44,7 @@ function ManagerMetricsDashboard() {
   const [topBadgeEarners, setTopBadgeEarners] = useState([]);
 
   const [averageTime, setAverageTime] = useState(null);
-
+  const [securityScore, setSecurityScore] = useState(null);
 
 
   const refreshAllData = async () => {
@@ -59,6 +59,8 @@ function ManagerMetricsDashboard() {
     await fetchEnrollEmployees();
     await fetchUnenrollEmployees(); // Ensuring this calls the correct function to refresh employee badges
     // Include any other fetch calls needed to refresh your UI accordingly
+    await fetchAverageTime();
+    await fetchSecurityScore();
   };
 
   const [chartData, setChartData] = useState({
@@ -145,20 +147,6 @@ function ManagerMetricsDashboard() {
     }
   };
   
-
-
-  useEffect(() => {
-    const fetchDataIfNeeded = async () => {
-      
-      await refreshAllData();
-    };
-  
-    fetchDataIfNeeded();
-    fetchAverageTime();
-    // This effect should only run when the page loads or when certain user properties change that necessitate a re-fetch.
-  }, [user.user_id, user.user_role, user.organization_id]);
-
-
   const fetchAverageTime = async () => {
     try {
         const response = await fetch(`http://localhost:4000/average-time/${user.organization_id}`);
@@ -168,6 +156,31 @@ function ManagerMetricsDashboard() {
         console.error('Error fetching average time:', error);
     }
   }; 
+
+  const fetchSecurityScore = async () => {
+    try {
+      const response = await fetch(`http://localhost:4000/security-score/${user.organization_id}`);
+      const data = await response.json();
+      setSecurityScore(data.security_score);
+      console.log(data);
+      console.log(data.securityScore);
+    } catch (error) {
+      console.error('Error fetching security score:', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchDataIfNeeded = async () => {
+      
+      await refreshAllData();
+    };
+  
+    fetchDataIfNeeded();
+    fetchAverageTime();
+    fetchSecurityScore();
+    // This effect should only run when the page loads or when certain user properties change that necessitate a re-fetch.
+  }, [user.user_id, user.user_role, user.organization_id]);
+
 
 
   useEffect(() => {
@@ -414,16 +427,34 @@ function ManagerMetricsDashboard() {
       const remainingSeconds = seconds % 60;
       return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
     };
-
+    
+    const getBackgroundColor = (score) => {
+      if (score > 75) {
+        return '#7fd47f'; // Green
+      } else if (score >= 50) {
+        return '#ffe066'; // Yellow
+      } else {
+        return '#ff9999'; // Red
+      }
+    };
+    
   return (
     <div style={{ padding: '20px' }}>
 
         <h2 style={{ borderBottom: '25px solid #17a2b8', paddingBottom: '10px' }}>Metrics Dashboard</h2>
-  
-        <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
-          <h3>Security Suggestion Based on Training Completion:</h3>
-          <p>{securitySuggestion}</p>
+
+        <div style={{ display: 'flex', marginTop: '20px' }}>
+          <div style={{ flex: '1', padding: '15px', backgroundColor: getBackgroundColor(securityScore), marginRight: '10px', borderRadius: '5px' }}>
+            <h3>Security Score:</h3>
+            <span style={{ fontSize: '24px' }}>{securityScore}%</span> 
+         </div>
+
+          <div style={{ flex: '3', padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
+            <h3>Security Suggestion Based on Training Completion:</h3>
+            <p>{securitySuggestion}</p>
+          </div>
         </div>
+
   
         <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
           <h3>Average Time Spent on Training Modules:</h3>
