@@ -620,6 +620,22 @@ router.post('/start-training', async (req, res) => {
     });
 });
 
+router.get('/average-time/:organizationId', (req, res) => {
+    const organizationId = req.params.organizationId;
+    const qry = `
+        SELECT ROUND(AVG(TIMESTAMPDIFF(SECOND, utm.start_time, utm.end_time))) AS average_duration
+        FROM user_training_modules utm
+        JOIN users u ON utm.user_id = u.user_id
+        WHERE u.organization_id = ? AND utm.status = 'completed';
+    `;
 
+    pool.query(qry, [organizationId], (err, results) => {
+        if (err) {
+            console.error('Error fetching average time:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json(results[0]);
+    });
+});
 
 module.exports = router;
