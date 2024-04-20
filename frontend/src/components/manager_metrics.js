@@ -47,8 +47,6 @@ function ManagerMetricsDashboard() {
 
 
 
-
-
   const refreshAllData = async () => {
     await fetchTrainingAssignments();
     await fetchEmployeeBadges();
@@ -401,8 +399,12 @@ function ManagerMetricsDashboard() {
     }, [trainingAssignments]); // Include dependencies if your trainingAssignments data might change
 
   
-  
-  
+    const formatDuration = (seconds) => {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const remainingSeconds = seconds % 60;
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    };
 
   return (
     <div style={{ padding: '20px' }}>
@@ -456,7 +458,7 @@ function ManagerMetricsDashboard() {
   
       
         <>
-        <div style={{ marginTop: '40px', backgroundColor: '#f2f2f2', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)' }}>
+        <div style={{ marginTop: '40px', backgroundColor: '#f2f2f2', padding: '20px', borderRadius: '10px', boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', width: '80%' }}>
           <h2 style={{ cursor: 'pointer' }}>
               Training Assignments for My Employees
           </h2>
@@ -473,42 +475,51 @@ function ManagerMetricsDashboard() {
                   {employeeAssignments[0].first_name} {employeeAssignments[0].last_name} {/* Assuming first_name and last_name are available */}
                 </h3>
                 {employeeVisibility[userId] && (
-                  <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
-                    {employeeAssignments.map((assignment) => (
-                      <li key={`${assignment.module_name}`} style={{ 
-                          padding: '10px', 
-                          marginBottom: '10px',
-                          backgroundColor: '#ffffff',
-                          borderRadius: '5px',
-                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
+                <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
+                  {employeeAssignments.map((assignment) => (
+                    <li key={`${assignment.module_name}`} style={{ 
+                        padding: '10px',
+                        marginBottom: '10px',
+                        backgroundColor: '#ffffff',
+                        borderRadius: '5px', 
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                    }}>
+                    <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                      <span style={{ fontWeight: 'bold' }}>{assignment.module_name}</span>
+                      {assignment.module_format === 'slidesQ' && (
+                        <>
+                        <span style={{ fontWeight: 'bold', marginLeft: 'auto' }}>{assignment.score}/5</span>
+                        </>
+                      )}
+                      <span style={{ 
+                            padding: '5px 10px', 
+                            borderRadius: '5px', 
+                            color: '#ffffff', 
+                            backgroundColor: assignment.status === 'completed' ? '#28a745' : '#dc3545',
+                            marginLeft: 'auto',
+                            alignSelf: 'center',
                       }}>
-                        
-                          <span style={{ fontWeight: 'bold' }}>{assignment.module_name}</span>
-                          {assignment.module_format === 'slidesQ' && (
-                          <>
-                          <span style={{ fontWeight: 'bold' }}>{assignment.score}/5</span>
-                          </>
-                          )}
-                          
-                          <span style={{ 
-                              padding: '5px 10px', 
-                              borderRadius: '5px', 
-                              color: '#ffffff', 
-                              backgroundColor: assignment.status === 'completed' ? '#28a745' : '#dc3545',
-                          }}>
-                          {assignment.status}
+                        {assignment.status}
+                      </span>
+                      </div>
+                        {assignment.status === 'completed' && (
+                          <span style={{ marginTop: '5px', marginLeft: 'auto' }}>
+                          {formatDuration(assignment.duration)}
                           </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            );
-          })}
+                        )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          );
+         })}
         </div>
+
+
 
 
 
