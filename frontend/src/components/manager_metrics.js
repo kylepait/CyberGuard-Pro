@@ -162,8 +162,6 @@ function ManagerMetricsDashboard() {
       const response = await fetch(`http://localhost:4000/security-score/${user.organization_id}`);
       const data = await response.json();
       setSecurityScore(data.security_score);
-      console.log(data);
-      console.log(data.securityScore);
     } catch (error) {
       console.error('Error fetching security score:', error);
     }
@@ -458,7 +456,7 @@ function ManagerMetricsDashboard() {
   
         <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
           <h3>Average Time Spent on Training Modules:</h3>
-          <p>{formatDuration(averageTime)}</p>
+          <span style={{ fontSize: '20px' }}>{formatDuration(averageTime)}</span>
         </div>
 
 
