@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MyChartComponent from './trainingModulesBarChart';
-import TrainingOverviewPieChart from './TrainingOverviewPieChart'; // Adjust the path as necessary
+import TrainingOverviewPieChart from './trainingOverviewPieChart'; // Adjust the path as necessary
 
 
 
