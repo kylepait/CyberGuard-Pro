@@ -383,7 +383,10 @@ router.post('/complete-scored-training', async (req, res) => {
 router.get('/training-assignments/:organizationId', (req, res) => {
     const organizationId = req.params.organizationId;
     const qry = `
-        SELECT utm.user_id, u.username, u.first_name, u.last_name, utm.module_id, tm.module_name, tm.module_format, utm.status, utm.score
+        SELECT utm.user_id, u.username, u.first_name, u.last_name, 
+               utm.module_id, tm.module_name, tm.module_format, 
+               utm.status, utm.score, utm.start_time, utm.end_time,
+               TIMESTAMPDIFF(SECOND, utm.start_time, utm.end_time) AS duration
         FROM user_training_modules utm
         JOIN users u ON utm.user_id = u.user_id
         JOIN training_modules tm ON utm.module_id = tm.module_id
@@ -614,6 +617,47 @@ router.post('/start-training', async (req, res) => {
             return res.status(500).json({ error: 'Internal Server Error' });
         }
         res.json({ success: true, message: 'Training module started successfully' });
+    });
+});
+
+router.get('/average-time/:organizationId', (req, res) => {
+    const organizationId = req.params.organizationId;
+    const qry = `
+        SELECT ROUND(AVG(TIMESTAMPDIFF(SECOND, utm.start_time, utm.end_time))) AS average_duration
+        FROM user_training_modules utm
+        JOIN users u ON utm.user_id = u.user_id
+        WHERE u.organization_id = ? AND utm.status = 'completed';
+    `;
+
+    pool.query(qry, [organizationId], (err, results) => {
+        if (err) {
+            console.error('Error fetching average time:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        res.json(results[0]);
+    });
+});
+
+router.get('/security-score/:organizationId', (req, res) => {
+    const organizationId = req.params.organizationId;
+    const qry = `
+        SELECT COUNT(CASE WHEN utm.status = 'assigned' THEN 1 END) AS assigned_count,
+               COUNT(CASE WHEN utm.status = 'completed' THEN 1 END) AS completed_count
+        FROM user_training_modules utm
+        JOIN users u ON utm.user_id = u.user_id
+        WHERE u.organization_id = ?;
+    `;
+
+    pool.query(qry, [organizationId], (err, results) => {
+        if (err) {
+            console.error('Error fetching security score:', err);
+            return res.status(500).json({ error: 'Internal Server Error' });
+        }
+        const assignedCount = results[0].assigned_count;
+        const completedCount = results[0].completed_count;
+        const ratio = (completedCount / (completedCount + assignedCount)) * 100; 
+        const score = ratio.toFixed(2);
+        res.json({ security_score: score });
     });
 });
 

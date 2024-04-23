@@ -43,10 +43,8 @@ function ManagerMetricsDashboard() {
   const [goalIncentive, setGoalIncentive] = useState('');
   const [topBadgeEarners, setTopBadgeEarners] = useState([]);
 
-
-
-
-
+  const [averageTime, setAverageTime] = useState(null);
+  const [securityScore, setSecurityScore] = useState(null);
 
 
   const refreshAllData = async () => {
@@ -61,6 +59,8 @@ function ManagerMetricsDashboard() {
     await fetchEnrollEmployees();
     await fetchUnenrollEmployees(); // Ensuring this calls the correct function to refresh employee badges
     // Include any other fetch calls needed to refresh your UI accordingly
+    await fetchAverageTime();
+    await fetchSecurityScore();
   };
 
   const [chartData, setChartData] = useState({
@@ -147,7 +147,25 @@ function ManagerMetricsDashboard() {
     }
   };
   
+  const fetchAverageTime = async () => {
+    try {
+        const response = await fetch(`http://localhost:4000/average-time/${user.organization_id}`);
+        const data = await response.json();
+        setAverageTime(data.average_duration);
+    } catch (error) {
+        console.error('Error fetching average time:', error);
+    }
+  }; 
 
+  const fetchSecurityScore = async () => {
+    try {
+      const response = await fetch(`http://localhost:4000/security-score/${user.organization_id}`);
+      const data = await response.json();
+      setSecurityScore(data.security_score);
+    } catch (error) {
+      console.error('Error fetching security score:', error);
+    }
+  };
 
   useEffect(() => {
     const fetchDataIfNeeded = async () => {
@@ -156,10 +174,10 @@ function ManagerMetricsDashboard() {
     };
   
     fetchDataIfNeeded();
+    fetchAverageTime();
+    fetchSecurityScore();
     // This effect should only run when the page loads or when certain user properties change that necessitate a re-fetch.
   }, [user.user_id, user.user_role, user.organization_id]);
-
-
 
 
 
@@ -401,17 +419,44 @@ function ManagerMetricsDashboard() {
     }, [trainingAssignments]); // Include dependencies if your trainingAssignments data might change
 
   
-  
-  
-
+    const formatDuration = (seconds) => {
+      const hours = Math.floor(seconds / 3600);
+      const minutes = Math.floor((seconds % 3600) / 60);
+      const remainingSeconds = seconds % 60;
+      return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(remainingSeconds).padStart(2, '0')}`;
+    };
+    
+    const getBackgroundColor = (score) => {
+      if (score > 75) {
+        return '#7fd47f'; // Green
+      } else if (score >= 50) {
+        return '#ffe066'; // Yellow
+      } else {
+        return '#ff9999'; // Red
+      }
+    };
+    
   return (
     <div style={{ padding: '20px' }}>
 
         <h2 style={{ borderBottom: '25px solid #17a2b8', paddingBottom: '10px' }}>Metrics Dashboard</h2>
+
+        <div style={{ display: 'flex', marginTop: '20px' }}>
+          <div style={{ flex: '1', padding: '15px', backgroundColor: getBackgroundColor(securityScore), marginRight: '10px', borderRadius: '5px' }}>
+            <h3>Security Score:</h3>
+            <span style={{ fontSize: '24px' }}>{securityScore}%</span> 
+         </div>
+
+          <div style={{ flex: '3', padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
+            <h3>Security Suggestion Based on Training Completion:</h3>
+            <p>{securitySuggestion}</p>
+          </div>
+        </div>
+
   
         <div style={{ marginTop: '20px', padding: '15px', backgroundColor: '#f0f0f0', borderRadius: '5px' }}>
-          <h3>Security Suggestion Based on Training Completion:</h3>
-          <p>{securitySuggestion}</p>
+          <h3>Average Time Spent on Training Modules:</h3>
+          <span style={{ fontSize: '20px' }}>{formatDuration(averageTime)}</span>
         </div>
 
 
@@ -473,42 +518,51 @@ function ManagerMetricsDashboard() {
                   {employeeAssignments[0].first_name} {employeeAssignments[0].last_name} {/* Assuming first_name and last_name are available */}
                 </h3>
                 {employeeVisibility[userId] && (
-                  <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
-                    {employeeAssignments.map((assignment) => (
-                      <li key={`${assignment.module_name}`} style={{ 
-                          padding: '10px', 
-                          marginBottom: '10px',
-                          backgroundColor: '#ffffff',
-                          borderRadius: '5px',
-                          boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                          alignItems: 'center',
+                <ul style={{ listStyleType: 'none', paddingLeft: '0' }}>
+                  {employeeAssignments.map((assignment) => (
+                    <li key={`${assignment.module_name}`} style={{ 
+                        padding: '10px',
+                        marginBottom: '10px',
+                        backgroundColor: '#ffffff',
+                        borderRadius: '5px', 
+                        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.05)',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'flex-start',
+                    }}>
+                    <div style={{ display: 'flex', alignItems: 'center', width: '100%' }}>
+                      <span style={{ fontWeight: 'bold' }}>{assignment.module_name}</span>
+                      {assignment.module_format === 'slidesQ' && (
+                        <>
+                        <span style={{ fontWeight: 'bold', marginLeft: 'auto' }}>{assignment.score}/5</span>
+                        </>
+                      )}
+                      <span style={{ 
+                            padding: '5px 10px', 
+                            borderRadius: '5px', 
+                            color: '#ffffff', 
+                            backgroundColor: assignment.status === 'completed' ? '#28a745' : '#dc3545',
+                            marginLeft: 'auto',
+                            alignSelf: 'center',
                       }}>
-                        
-                          <span style={{ fontWeight: 'bold' }}>{assignment.module_name}</span>
-                          {assignment.module_format === 'slidesQ' && (
-                          <>
-                          <span style={{ fontWeight: 'bold' }}>{assignment.score}/5</span>
-                          </>
-                          )}
-                          
-                          <span style={{ 
-                              padding: '5px 10px', 
-                              borderRadius: '5px', 
-                              color: '#ffffff', 
-                              backgroundColor: assignment.status === 'completed' ? '#28a745' : '#dc3545',
-                          }}>
-                          {assignment.status}
+                        {assignment.status}
+                      </span>
+                      </div>
+                        {assignment.status === 'completed' && (
+                          <span style={{ marginTop: '5px', marginLeft: 'auto' }}>
+                          {formatDuration(assignment.duration)}
                           </span>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            );
-          })}
+                        )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          );
+         })}
         </div>
+
+
 
 
 
